@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
 * Студент: [Даниил Топольский](https://up.htmlacademy.ru/ecmascript-individual/2/user/586815).
-* Наставник: `Неизвестно`.
+* Наставник: [Евгениё Лепешкин](https://htmlacademy.ru/profile/spearance).
 
 ---
 
