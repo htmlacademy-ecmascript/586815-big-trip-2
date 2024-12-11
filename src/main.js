@@ -1,7 +1,7 @@
-import TripInfoPresentor from '../src/presenter/trip-info.js';
-import TripFiltresPresentor from '../src/presenter/trip-filtres.js';
-import TripSortPresentor from './presenter/trip-sort.js';
-import TripEventsPresentor from './presenter/trip-events.js';
+import TripInfoPresentor from './presenter/trip-info-presenter.js';
+import TripFiltresPresentor from './presenter/trip-filtres-presenter.js';
+import TripSortPresentor from './presenter/trip-sort-presenter.js';
+import TripEventsPresentor from './presenter/trip-events-presenter.js';
 
 const tripHeaderContainer = document.querySelector('.trip-main');
 const tripFiltresContainer = tripHeaderContainer.querySelector('.trip-controls__filters');

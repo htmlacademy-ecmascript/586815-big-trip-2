@@ -1,4 +1,4 @@
-import TripFiltres from '../view/trip-filtres.js';
+import TripFiltres from '../view/trip-filtres-view.js';
 import { render } from '../render.js';
 
 export default class TripFiltresPresentor {
