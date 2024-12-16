@@ -4,22 +4,21 @@ import EventPoint from '../view/trip-events/event-point-view.js';
 import EditablePoint from '../view/trip-events/edit-event-point-view.js';
 import { render } from '../render.js';
 
-const MAX_AMOUNT_POINTS = 3;
-
 export default class TripEventsPresentor {
   eventListComponent = new EventList();
   eventItem = new EventItem();
 
-  constructor({container}) {
+  constructor({container, tasksModel}) {
     this.container = container;
+    this.tasksModel = tasksModel;
   }
 
   init() {
+    this.eventTasks = [...this.tasksModel.getTasks()];
     render(this.eventListComponent, this.container);
-    for (let i = 0; i < MAX_AMOUNT_POINTS; i++) {
-      render(this.eventItem, this.eventListComponent.getElement());
-      const renderingContent = i === 0 ? new EditablePoint() : new EventPoint();
-      render(renderingContent, this.eventItem.getElement());
+    for (let i = 0; i < this.eventTasks.length; i++) {
+      const renderingContent = i === 0 ? new EditablePoint({task: this.eventTasks[i]}) : new EventPoint({task: this.eventTasks[i]});
+      render(renderingContent, this.eventListComponent.getElement());
     }
   }
 }
