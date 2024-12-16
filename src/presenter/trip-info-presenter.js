@@ -1,8 +1,8 @@
-import TripInfoMainContainer from '../view/trip-info/main-container.js';
-import TripInfoContainer from '../view/trip-info/container.js';
-import TripInfoTitle from '../view/trip-info/title.js';
-import TripInfoDates from '../view/trip-info/dates.js';
-import TripInfoCost from '../view/trip-info/cost.js';
+import TripInfoMainContainer from '../view/trip-info/main-container-view.js';
+import TripInfoContainer from '../view/trip-info/container-view.js';
+import TripInfoTitle from '../view/trip-info/title-view.js';
+import TripInfoDates from '../view/trip-info/dates-view.js';
+import TripInfoCost from '../view/trip-info/cost-view.js';
 import { RenderPosition, render } from '../render.js';
 
 export default class TripInfoPresentor {

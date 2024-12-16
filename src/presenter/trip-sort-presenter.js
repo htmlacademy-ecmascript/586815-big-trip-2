@@ -1,4 +1,4 @@
-import TripSort from '../view/trip-sort';
+import TripSort from '../view/trip-sort-view.js';
 import { render } from '../render.js';
 
 export default class TripSortPresentor {
