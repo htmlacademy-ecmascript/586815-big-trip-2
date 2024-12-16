@@ -11,7 +11,7 @@ function createEditableEventTemplate(task) {
   const allOffers = getOffersOfType(task);
   const сurrentOffersId = new Set(offers.map((obj) => obj.id));
   const getStatusOffer = (id) => сurrentOffersId.has(id) ? 'checked' : '';
-  const getLastWordTitle = (title) => title.split(' ')[title.length - 1];
+  const getLastWordTitle = (title) => title.split(' ')[title.split(' ').length - 1];
   const getStatusType = (itemType) => itemType.toLowerCase() === type ? 'checked' : '';
 
   return `
