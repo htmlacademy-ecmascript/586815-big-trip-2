@@ -178,7 +178,7 @@ const destinations = [
     ]
   },
   {
-    id: '3',
+    id: '4',
     description: 'Riga, is a beautiful city, a true asian pearl, with crowded streets.',
     name: 'Riga',
     pictures: [

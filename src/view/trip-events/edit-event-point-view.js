@@ -1,16 +1,13 @@
 import { createElement } from '../../render.js';
 import { humanizeTaskDateTime } from '../../utils.js';
-import { getOffersOfType, destinationNames } from '../../model/tasks-model.js';
 import { TYPES_POINT } from '../../const.js';
 
-function createEditableEventTemplate(task) {
-  const { type, destination, dateFrom, dateTo, basePrice, offers } = task;
+function createEditableEventTemplate(event, destination, destinationsNames, offersOfType) {
+  const { type, dateFrom, dateTo, basePrice, offers } = event;
 
   const departure = humanizeTaskDateTime(dateFrom);
   const arrival = humanizeTaskDateTime(dateTo);
-  const allOffers = getOffersOfType(task);
-  const сurrentOffersId = new Set(offers.map((obj) => obj.id));
-  const getStatusOffer = (id) => сurrentOffersId.has(id) ? 'checked' : '';
+  const getStatusOffer = (id) => offers.includes(id) ? 'checked' : '';
   const getLastWordTitle = (title) => title.split(' ')[title.split(' ').length - 1];
   const getStatusType = (itemType) => itemType.toLowerCase() === type ? 'checked' : '';
 
@@ -43,7 +40,7 @@ ${TYPES_POINT.map((item) =>`
                     </label>
                     <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
                     <datalist id="destination-list-1">
-                    ${destinationNames.map((city) =>`<option value="${city}"></option>`).join('')}
+                    ${destinationsNames.map((city) =>`<option value="${city}"></option>`).join('')}
                     </datalist>
                   </div>
 
@@ -75,7 +72,7 @@ ${TYPES_POINT.map((item) =>`
 
                     <div class="event__available-offers">
 
-                      ${allOffers.map((offer) =>
+                      ${offersOfType.offers.map((offer) =>
     `<div class="event__offer-selector">
                         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${getLastWordTitle(offer.title)}-1" type="checkbox" name="event-offer-${getLastWordTitle(offer.title)}"
                         ${getStatusOffer(offer.id)}>
@@ -107,12 +104,15 @@ ${TYPES_POINT.map((item) =>`
 }
 
 export default class EditablePoint {
-  constructor ({task}) {
-    this.task = task;
+  constructor ({event, destination, destinationsNames, offersOfType}) {
+    this.event = event;
+    this.destination = destination;
+    this.destinationsNames = destinationsNames;
+    this.offersOfType = offersOfType;
   }
 
   getTemplate() {
-    return createEditableEventTemplate(this.task);
+    return createEditableEventTemplate(this.event, this.destination, this.destinationsNames, this.offersOfType);
   }
 
   getElement() {

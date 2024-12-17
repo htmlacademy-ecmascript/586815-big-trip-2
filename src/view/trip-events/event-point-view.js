@@ -1,8 +1,8 @@
 import { createElement } from '../../render.js';
 import { humanizeTaskDateTime, calculateDuration } from '../../utils.js';
 
-function createEventPointTemplate(task) {
-  const { basePrice, destination, type, offers, dateFrom, dateTo, isFavorite } = task;
+function createEventPointTemplate(event, cityName, selectedOffers) {
+  const { basePrice, type, dateFrom, dateTo, isFavorite } = event;
 
   const departure = humanizeTaskDateTime(dateFrom);
   const arrival = humanizeTaskDateTime(dateTo);
@@ -18,7 +18,7 @@ function createEventPointTemplate(task) {
                 <div class="event__type">
                   <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
                 </div>
-                <h3 class="event__title">${type} ${destination.name}</h3>
+                <h3 class="event__title">${type} ${cityName}</h3>
                 <div class="event__schedule">
                   <p class="event__time">
                     <time class="event__start-time" datetime="${departure.dateTimeFull}">${departure.time}</time>
@@ -32,7 +32,7 @@ function createEventPointTemplate(task) {
                 </p>
                 <h4 class="visually-hidden">Offers:</h4>
                 <ul class="event__selected-offers">
-                  ${offers.map((offer) => `
+                  ${selectedOffers.map((offer) => `
                   <li class="event__offer">
                     <span class="event__offer-title">${offer.title}</span>
                     &plus;&euro;&nbsp;
@@ -54,12 +54,14 @@ function createEventPointTemplate(task) {
 }
 
 export default class EventPoint {
-  constructor ({task}) {
-    this.task = task;
+  constructor ({event, cityName, selectedOffers}) {
+    this.event = event;
+    this.cityName = cityName;
+    this.selectedOffers = selectedOffers;
   }
 
   getTemplate() {
-    return createEventPointTemplate(this.task);
+    return createEventPointTemplate(this.event, this.cityName, this.selectedOffers);
   }
 
   getElement() {
