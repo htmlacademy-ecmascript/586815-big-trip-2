@@ -1,4 +1,4 @@
-import { createElement } from '../../render.js';
+import AbstractView from '../../framework/view/abstract-view.js';
 import { humanizeTaskDateTime, calculateDuration } from '../../utils.js';
 
 function createEventPointTemplate(event, cityName, selectedOffers) {
@@ -12,7 +12,6 @@ function createEventPointTemplate(event, cityName, selectedOffers) {
     : 'event__favorite-btn';
 
   return `
-  <li class="trip-events__item">
   <div class="event">
                 <time class="event__date" datetime="${departure.dateFull}">${departure.date}</time>
                 <div class="event__type">
@@ -49,29 +48,29 @@ function createEventPointTemplate(event, cityName, selectedOffers) {
                   <span class="visually-hidden">Open event</span>
                 </button>
               </div>
-              </li>
   `;
 }
 
-export default class EventPoint {
-  constructor ({event, cityName, selectedOffers}) {
-    this.event = event;
+export default class EventPoint extends AbstractView {
+  #event = null;
+  #handleArrowClick = null;
+
+  constructor ({event, cityName, selectedOffers, onArrowClick}) {
+    super();
+    this.#event = event;
     this.cityName = cityName;
     this.selectedOffers = selectedOffers;
+    this.#handleArrowClick = onArrowClick;
+
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#arrowClickHandler);
   }
 
-  getTemplate() {
-    return createEventPointTemplate(this.event, this.cityName, this.selectedOffers);
+  get template() {
+    return createEventPointTemplate(this.#event, this.cityName, this.selectedOffers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #arrowClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleArrowClick();
+  };
 }

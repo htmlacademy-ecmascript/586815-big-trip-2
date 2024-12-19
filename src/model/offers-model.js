@@ -2,20 +2,22 @@ import { offersList } from '../mock/mocks.js';
 
 
 export default class OffersModel {
+  #offers = [];
+
   constructor () {
-    this.offers = [];
+    this.#offers = [];
   }
 
   init () {
-    this.offers = offersList;
+    this.#offers = offersList;
   }
 
   getDestinations () {
-    return this.offers;
+    return this.#offers;
   }
 
   getOffersByType (eventType) {
-    return this.offers.find(({type}) => type === eventType);
+    return this.#offers.find(({type}) => type === eventType);
   }
 
   getCurrentOffers (offersOfType, point) {

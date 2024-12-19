@@ -1,4 +1,4 @@
-import { createElement } from '../../render.js';
+import AbstractView from '../../framework/view/abstract-view.js';
 
 function createDatesTemplate() {
   return `
@@ -6,19 +6,8 @@ function createDatesTemplate() {
   `;
 }
 
-export default class TripInfoDates {
-  getTemplate() {
+export default class TripInfoDates extends AbstractView {
+  get template() {
     return createDatesTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }
