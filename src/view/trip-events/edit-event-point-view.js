@@ -1,16 +1,13 @@
-import { createElement } from '../../render.js';
+import AbstractView from '../../framework/view/abstract-view.js';
 import { humanizeTaskDateTime } from '../../utils.js';
-import { getOffersOfType, destinationNames } from '../../model/tasks-model.js';
 import { TYPES_POINT } from '../../const.js';
 
-function createEditableEventTemplate(task) {
-  const { type, destination, dateFrom, dateTo, basePrice, offers } = task;
+function createEditableEventTemplate(event, destination, destinationsNames, offersByType) {
+  const { type, dateFrom, dateTo, basePrice, offers } = event;
 
   const departure = humanizeTaskDateTime(dateFrom);
   const arrival = humanizeTaskDateTime(dateTo);
-  const allOffers = getOffersOfType(task);
-  const сurrentOffersId = new Set(offers.map((obj) => obj.id));
-  const getStatusOffer = (id) => сurrentOffersId.has(id) ? 'checked' : '';
+  const getStatusOffer = (id) => offers.includes(id) ? 'checked' : '';
   const getLastWordTitle = (title) => title.split(' ')[title.split(' ').length - 1];
   const getStatusType = (itemType) => itemType.toLowerCase() === type ? 'checked' : '';
 
@@ -43,7 +40,7 @@ ${TYPES_POINT.map((item) =>`
                     </label>
                     <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
                     <datalist id="destination-list-1">
-                    ${destinationNames.map((city) =>`<option value="${city}"></option>`).join('')}
+                    ${destinationsNames.map((city) =>`<option value="${city}"></option>`).join('')}
                     </datalist>
                   </div>
 
@@ -75,7 +72,7 @@ ${TYPES_POINT.map((item) =>`
 
                     <div class="event__available-offers">
 
-                      ${allOffers.map((offer) =>
+                      ${offersByType.offers.map((offer) =>
     `<div class="event__offer-selector">
                         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${getLastWordTitle(offer.title)}-1" type="checkbox" name="event-offer-${getLastWordTitle(offer.title)}"
                         ${getStatusOffer(offer.id)}>
@@ -106,23 +103,35 @@ ${TYPES_POINT.map((item) =>`
   `;
 }
 
-export default class EditablePoint {
-  constructor ({task}) {
-    this.task = task;
+export default class EditablePoint extends AbstractView {
+  #handleFormSubmit = null;
+  #handleCloseButtonClick = null;
+
+
+  constructor ({event, destination, destinationsNames, offersByType, onFormSubmit, onCloseButtonClick}) {
+    super();
+    this.event = event;
+    this.destination = destination;
+    this.destinationsNames = destinationsNames;
+    this.offersByType = offersByType;
+    this.#handleFormSubmit = onFormSubmit;
+    this.#handleCloseButtonClick = onCloseButtonClick;
+
+    this.element.addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeButtonHandler);
   }
 
-  getTemplate() {
-    return createEditableEventTemplate(this.task);
+  get template() {
+    return createEditableEventTemplate(this.event, this.destination, this.destinationsNames, this.offersByType);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 
-  removeElement() {
-    this.element = null;
-  }
+  #closeButtonHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleCloseButtonClick();
+  };
 }

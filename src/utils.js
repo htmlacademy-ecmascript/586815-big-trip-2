@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
 const SORT_COUNT = 0.5;
+const DAYJS_FORMAT = 2;
 
 dayjs.extend(duration);
 
@@ -15,11 +16,11 @@ const calculateDuration = (dateFrom, dateTo) => {
   const minutes = diff.minutes();
 
   if (days > 0) {
-    return `${days.toString().padStart(2, '0')}D ${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
+    return `${days.toString().padStart(DAYJS_FORMAT, '0')}D ${hours.toString().padStart(DAYJS_FORMAT, '0')}H ${minutes.toString().padStart(DAYJS_FORMAT, '0')}M`;
   } else if (hours > 0) {
-    return `${hours.toString().padStart(2, '0')}H ${minutes.toString().padStart(2, '0')}M`;
+    return `${hours.toString().padStart(DAYJS_FORMAT, '0')}H ${minutes.toString().padStart(DAYJS_FORMAT, '0')}M`;
   } else {
-    return `${minutes.toString().padStart(2, '0')}M`;
+    return `${minutes.toString().padStart(DAYJS_FORMAT, '0')}M`;
   }
 };
 
