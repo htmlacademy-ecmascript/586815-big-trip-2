@@ -1,8 +1,8 @@
-import { createElement } from '../../render.js';
+import AbstractView from '../../framework/view/abstract-view.js';
 import { humanizeTaskDateTime, calculateDuration } from '../../utils.js';
 
-function createEventPointTemplate(task) {
-  const { basePrice, destination, type, offers, dateFrom, dateTo, isFavorite } = task;
+function createEventPointTemplate(event, cityName, selectedOffers) {
+  const { basePrice, type, dateFrom, dateTo, isFavorite } = event;
 
   const departure = humanizeTaskDateTime(dateFrom);
   const arrival = humanizeTaskDateTime(dateTo);
@@ -12,13 +12,12 @@ function createEventPointTemplate(task) {
     : 'event__favorite-btn';
 
   return `
-  <li class="trip-events__item">
   <div class="event">
                 <time class="event__date" datetime="${departure.dateFull}">${departure.date}</time>
                 <div class="event__type">
                   <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
                 </div>
-                <h3 class="event__title">${type} ${destination.name}</h3>
+                <h3 class="event__title">${type} ${cityName}</h3>
                 <div class="event__schedule">
                   <p class="event__time">
                     <time class="event__start-time" datetime="${departure.dateTimeFull}">${departure.time}</time>
@@ -32,7 +31,7 @@ function createEventPointTemplate(task) {
                 </p>
                 <h4 class="visually-hidden">Offers:</h4>
                 <ul class="event__selected-offers">
-                  ${offers.map((offer) => `
+                  ${selectedOffers.map((offer) => `
                   <li class="event__offer">
                     <span class="event__offer-title">${offer.title}</span>
                     &plus;&euro;&nbsp;
@@ -49,27 +48,29 @@ function createEventPointTemplate(task) {
                   <span class="visually-hidden">Open event</span>
                 </button>
               </div>
-              </li>
   `;
 }
 
-export default class EventPoint {
-  constructor ({task}) {
-    this.task = task;
+export default class EventPoint extends AbstractView {
+  #event = null;
+  #handleArrowClick = null;
+
+  constructor ({event, cityName, selectedOffers, onArrowClick}) {
+    super();
+    this.#event = event;
+    this.cityName = cityName;
+    this.selectedOffers = selectedOffers;
+    this.#handleArrowClick = onArrowClick;
+
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#arrowClickHandler);
   }
 
-  getTemplate() {
-    return createEventPointTemplate(this.task);
+  get template() {
+    return createEventPointTemplate(this.#event, this.cityName, this.selectedOffers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #arrowClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleArrowClick();
+  };
 }
