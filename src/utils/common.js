@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import isBetween from 'dayjs/plugin/isBetween';
 
 const SORT_COUNT = 0.5;
 const DAYJS_FORMAT = 2;
 
 dayjs.extend(duration);
+dayjs.extend(isBetween);
 
 const calculateDuration = (dateFrom, dateTo) => {
   const start = dayjs(dateFrom);
@@ -51,4 +53,16 @@ function getRandomInteger () {
   return Math.random();
 }
 
-export {getRandomArrayElement, getRandomSentences, getRandomInteger, getRandomArray, humanizeTaskDateTime, calculateDuration};
+function isEventInFuture(dueDate) {
+  return dueDate && dayjs().isBefore(dueDate, 'D');
+}
+
+function isEventExpired(dueDate) {
+  return dueDate && dayjs().isAfter(dueDate, 'D');
+}
+
+function isCurrentDayInRange(startDate, endDate) {
+  return dayjs().isBetween(startDate, endDate, 'day', '[]');
+}
+
+export {getRandomArrayElement, getRandomSentences, getRandomInteger, getRandomArray, humanizeTaskDateTime, calculateDuration, isEventInFuture, isCurrentDayInRange, isEventExpired};

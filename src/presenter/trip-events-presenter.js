@@ -3,6 +3,8 @@ import EventItem from '../view/trip-events/item-view.js';
 import EventPoint from '../view/trip-events/event-point-view.js';
 import EditablePoint from '../view/trip-events/edit-event-point-view.js';
 import { render, replace } from '../framework/render.js';
+import { MessageListEmpty } from '../const.js';
+import ListEmptyMessageView from '../view/trip-events/list-empty-view.js';
 
 export default class TripEventsPresenter {
   #container = null;
@@ -22,6 +24,11 @@ export default class TripEventsPresenter {
 
   init() {
     this.#eventTasks = [...this.#eventsModel.events];
+
+    if(this.#eventTasks.length === 0) {
+      render(new ListEmptyMessageView({message: MessageListEmpty}), this.#container);
+    }
+
     render(this.#eventListComponent, this.#container);
     for (let i = 0; i < this.#eventTasks.length; i++) {
       this.#eventItem = new EventItem();
@@ -81,10 +88,3 @@ export default class TripEventsPresenter {
     render(eventPointComponent, this.#eventItem.element);
   }
 }
-
-// const offersOfType = this.#offersModel.getOffersByType(this.#eventTasks[i].type);
-// const selectedOffers = this.#offersModel.getCurrentOffers(offersOfType, this.#eventTasks[i]);
-// const destination = this.#destinationsModel.getDestinationById(this.#eventTasks[i].destination);
-// const destinationsNames = this.#destinationsModel.destinationsNames;
-// // i === 0 ? new EditablePoint({event: this.eventTasks[i], destination: destination, destinationsNames: destinationsNames, offersOfType: offersOfType}) :
-// const renderingContent = new EventPoint({event: this.#eventTasks[i], cityName: destination.name, selectedOffers: selectedOffers});

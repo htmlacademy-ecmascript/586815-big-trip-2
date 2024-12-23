@@ -1,5 +1,5 @@
 import AbstractView from '../../framework/view/abstract-view.js';
-import { humanizeTaskDateTime, calculateDuration } from '../../utils.js';
+import { humanizeTaskDateTime, calculateDuration } from '../../utils/common.js';
 
 function createEventPointTemplate(event, cityName, selectedOffers) {
   const { basePrice, type, dateFrom, dateTo, isFavorite } = event;
