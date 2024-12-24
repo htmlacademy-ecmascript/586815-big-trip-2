@@ -1,4 +1,6 @@
-import { getRandomArrayElement, getRandomArray, getRandomInteger } from '../utils.js';
+import { getRandomArrayElement, getRandomArray, getRandomInteger } from '../utils/common.js';
+
+const currentFilter = 'Everything';
 
 const offersList = [
   {
@@ -266,4 +268,4 @@ function getRandomDestination (cityes) {
 
 const randomPoints = getRandomArray(points);
 
-export {randomPoints, destinations, offersList };
+export {randomPoints, destinations, offersList, currentFilter };

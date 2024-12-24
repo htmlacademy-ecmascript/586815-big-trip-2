@@ -1,5 +1,5 @@
 import TripSort from '../view/trip-sort-view.js';
-import { render } from '../framework/render.js';
+import { render, RenderPosition } from '../framework/render.js';
 
 export default class TripSortPresenter {
   #container = null;
@@ -10,7 +10,9 @@ export default class TripSortPresenter {
   }
 
   init() {
-    render(this.#sortComponent, this.#container);
+    if (!this.#container.querySelector('.trip-events__msg')) {
+      render(this.#sortComponent, this.#container, RenderPosition.AFTERBEGIN);
+    }
   }
 }
 

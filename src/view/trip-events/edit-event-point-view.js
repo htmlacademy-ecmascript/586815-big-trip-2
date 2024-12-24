@@ -1,5 +1,5 @@
 import AbstractView from '../../framework/view/abstract-view.js';
-import { humanizeTaskDateTime } from '../../utils.js';
+import { humanizeTaskDateTime } from '../../utils/common.js';
 import { TYPES_POINT } from '../../const.js';
 
 function createEditableEventTemplate(event, destination, destinationsNames, offersByType) {

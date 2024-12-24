@@ -1,18 +1,18 @@
 import TripInfoPresenter from './presenter/trip-info-presenter.js';
-import TripFiltresPresenter from './presenter/trip-filtres-presenter.js';
+import TripFiltersPresenter from './presenter/trip-filters-presenter.js';
 import TripSortPresenter from './presenter/trip-sort-presenter.js';
 import TripEventsPresenter from './presenter/trip-events-presenter.js';
 import EventsModel from './model/events-model.js';
 import DestinationsModel from './model/destinations-model.js';
 import OffersModel from './model/offers-model.js';
+import { generateFilter } from './utils/filter.js';
 
 const tripHeaderContainer = document.querySelector('.trip-main');
-const tripFiltresContainer = tripHeaderContainer.querySelector('.trip-controls__filters');
+const tripFiltersContainer = tripHeaderContainer.querySelector('.trip-controls__filters');
 const tripEventsContainer = document.querySelector('.trip-events');
 
-const tripInfoPresentor = new TripInfoPresenter({container: tripHeaderContainer});
-const tripFiltresPresentor = new TripFiltresPresenter({container: tripFiltresContainer});
-const sortPresentor = new TripSortPresenter({container: tripEventsContainer });
+const tripInfoPresenter = new TripInfoPresenter({container: tripHeaderContainer});
+const sortPresenter = new TripSortPresenter({container: tripEventsContainer });
 
 const eventsModel = new EventsModel();
 const destinationsModel = new DestinationsModel();
@@ -22,14 +22,18 @@ eventsModel.init();
 destinationsModel.init();
 offersModel.init();
 
-const eventPointsPresentor = new TripEventsPresenter({
+const eventPointsPresenter = new TripEventsPresenter({
   container: tripEventsContainer,
   eventsModel,
   destinationsModel,
   offersModel
 });
 
-tripInfoPresentor.init();
-tripFiltresPresentor.init();
-sortPresentor.init();
-eventPointsPresentor.init();
+const filters = generateFilter(eventsModel.events);
+const tripFiltersPresenter = new TripFiltersPresenter({container: tripFiltersContainer, filters: filters});
+
+tripInfoPresenter.init();
+tripFiltersPresenter.init();
+eventPointsPresenter.init();
+sortPresenter.init();
+
