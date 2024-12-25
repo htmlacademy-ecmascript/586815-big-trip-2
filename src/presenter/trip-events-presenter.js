@@ -44,7 +44,8 @@ export default class TripEventsPresenter {
         destinationsModel: this.#destinationsModel,
         offersModel: this.#offersModel,
         eventData: this.#eventsData[i],
-        onFavoriteButtonClick: this.#handleEventChange});
+        onFavoriteButtonClick: this.#handleEventChange,
+        onPointStateChange: this.#handlePointStateChange});
       this.#presentersPoints.set(this.#eventsData[i].id, eventPresenter);
       eventPresenter.init();
     }
@@ -53,5 +54,9 @@ export default class TripEventsPresenter {
   #handleEventChange = (updatedEvent) => {
     this.#eventsData = updateItem(this.#eventsData, updatedEvent);
     this.#presentersPoints.get(updatedEvent.id).updateEventData(updatedEvent);
+  };
+
+  #handlePointStateChange = () => {
+    this.#presentersPoints.forEach((presenterPoint) => presenterPoint.resetLastEditForm());
   };
 }

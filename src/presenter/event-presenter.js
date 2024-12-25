@@ -10,14 +10,16 @@ export default class EventPresenter {
   #eventPointComponent = null;
   #editablePointComponent = null;
   #onFavoriteButtonClick = null;
+  #onPointStateChange = null;
   #isOpenEditForm = false;
 
-  constructor({container, destinationsModel, offersModel,eventData, onFavoriteButtonClick}) {
+  constructor({container, destinationsModel, offersModel,eventData, onFavoriteButtonClick, onPointStateChange}) {
     this.#container = container;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#eventData = eventData;
     this.#onFavoriteButtonClick = onFavoriteButtonClick;
+    this.#onPointStateChange = onPointStateChange;
   }
 
   updateEventData(updatedEventData) {
@@ -52,7 +54,6 @@ export default class EventPresenter {
       selectedOffers: info.selectedOffers,
       cityName: info.destination.name,
       onOpenButtonClick: () => {
-        this.#resetLastEditForm();
         this.#openEditForm();
         document.addEventListener('keydown', escKeyDownHandler);
       },
@@ -84,6 +85,7 @@ export default class EventPresenter {
   }
 
   #openEditForm () {
+    this.#onPointStateChange();
     this.#isOpenEditForm = true;
     replace(this.#editablePointComponent, this.#eventPointComponent);
   }
@@ -97,7 +99,7 @@ export default class EventPresenter {
     this.#onFavoriteButtonClick({...this.#eventData, isFavorite: !this.#eventData.isFavorite});
   }
 
-  #resetLastEditForm () {
+  resetLastEditForm () {
     if (this.#isOpenEditForm) {
       this.#closeEditForm();
     }
