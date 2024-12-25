@@ -52,7 +52,6 @@ export default class EventPresenter {
       selectedOffers: info.selectedOffers,
       cityName: info.destination.name,
       onOpenButtonClick: () => {
-        // replacePointToForm();
         this.#resetLastEditForm();
         this.#openEditForm();
         document.addEventListener('keydown', escKeyDownHandler);
