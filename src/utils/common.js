@@ -65,4 +65,10 @@ function isCurrentDayInRange(startDate, endDate) {
   return dayjs().isBetween(startDate, endDate, 'day', '[]');
 }
 
-export {getRandomArrayElement, getRandomSentences, getRandomInteger, getRandomArray, humanizeTaskDateTime, calculateDuration, isEventInFuture, isCurrentDayInRange, isEventExpired};
+function updateItem(eventsData, updatedItem) {
+  return eventsData.map((item) =>
+    item.id === updatedItem.id ? {...item, ...updatedItem} : item
+  );
+}
+
+export {getRandomArrayElement, getRandomSentences, getRandomInteger, getRandomArray, humanizeTaskDateTime, calculateDuration, isEventInFuture, isCurrentDayInRange, isEventExpired, updateItem};

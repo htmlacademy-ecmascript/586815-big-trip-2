@@ -53,24 +53,31 @@ function createEventPointTemplate(event, cityName, selectedOffers) {
 
 export default class EventPoint extends AbstractView {
   #event = null;
-  #handleArrowClick = null;
+  #handleOpenButtonClick = null;
+  #handleFavoriteButtonClick = null;
 
-  constructor ({event, cityName, selectedOffers, onArrowClick}) {
+  constructor ({event, cityName, selectedOffers, onOpenButtonClick, onFavoriteButtonClick}) {
     super();
     this.#event = event;
     this.cityName = cityName;
     this.selectedOffers = selectedOffers;
-    this.#handleArrowClick = onArrowClick;
+    this.#handleOpenButtonClick = onOpenButtonClick;
+    this.#handleFavoriteButtonClick = onFavoriteButtonClick;
 
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#arrowClickHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#openButtonClickHandler);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteButtonClickHandler);
   }
 
   get template() {
     return createEventPointTemplate(this.#event, this.cityName, this.selectedOffers);
   }
 
-  #arrowClickHandler = (evt) => {
+  #openButtonClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleArrowClick();
+    this.#handleOpenButtonClick();
+  };
+
+  #favoriteButtonClickHandler = () => {
+    this.#handleFavoriteButtonClick();
   };
 }
