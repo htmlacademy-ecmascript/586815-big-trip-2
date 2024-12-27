@@ -48,7 +48,6 @@ export default class TripSort extends AbstractView {
 
   #sortTypeChangeHandler = (evt) => {
     if (evt.target.matches('[data-sort-type]')) {
-      // evt.preventDefault();
       this.#handleSortTypeChange(evt.target.dataset.sortType);
     }
   };
