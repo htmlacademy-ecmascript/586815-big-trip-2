@@ -1,6 +1,7 @@
 import EventPoint from '../view/trip-events/event-point-view.js';
 import EditablePoint from '../view/trip-events/edit-event-point-view.js';
 import { render, replace, remove } from '../framework/render.js';
+import { isEscapeKey } from '../utils/common.js';
 
 export default class EventPresenter {
   #container = null;
@@ -41,25 +42,13 @@ export default class EventPresenter {
   }
 
   #renderEvent (event, info) {
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        this.#closeEditForm();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
 
     this.#eventPointComponent = new EventPoint({
       event: event,
       selectedOffers: info.selectedOffers,
       cityName: info.destination.name,
-      onOpenButtonClick: () => {
-        this.#openEditForm();
-        document.addEventListener('keydown', escKeyDownHandler);
-      },
-      onFavoriteButtonClick: () => {
-        this.#toggleFavoriteStatus();
-      }
+      onOpenButtonClick: this.#openButtonClickHandler,
+      onFavoriteButtonClick: this.#toggleFavoriteStatus
     });
 
     this.#editablePointComponent = new EditablePoint({
@@ -67,14 +56,8 @@ export default class EventPresenter {
       destination: info.destination,
       destinationsNames: info.destinationsNames,
       offersByType: info.offersByType,
-      onFormSubmit: () => {
-        this.#closeEditForm();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      },
-      onCloseButtonClick: () => {
-        this.#closeEditForm();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
+      onFormSubmit: this.#formSubmitHandler,
+      onCloseButtonClick: this.#closeButtonClickHandler
     });
 
     if (this.#isOpenEditForm) {
@@ -95,9 +78,32 @@ export default class EventPresenter {
     replace(this.#eventPointComponent, this.#editablePointComponent);
   }
 
-  #toggleFavoriteStatus() {
+  #toggleFavoriteStatus = () => {
     this.#onFavoriteButtonClick({...this.#eventData, isFavorite: !this.#eventData.isFavorite});
-  }
+  };
+
+  #escKeyDownHandler = (evt) => {
+    if (isEscapeKey(evt)) {
+      evt.preventDefault();
+      this.#closeEditForm();
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
+    }
+  };
+
+  #openButtonClickHandler = () => {
+    this.#openEditForm();
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #formSubmitHandler = () => {
+    this.#closeEditForm();
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #closeButtonClickHandler = () => {
+    this.#closeEditForm();
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  };
 
   resetLastEditForm () {
     if (this.#isOpenEditForm) {

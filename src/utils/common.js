@@ -8,11 +8,10 @@ const DAYJS_FORMAT = 2;
 dayjs.extend(duration);
 dayjs.extend(isBetween);
 
-const calculateDuration = (dateFrom, dateTo) => {
-  const start = dayjs(dateFrom);
-  const end = dayjs(dateTo);
+const getDurationInMs = (dateFrom, dateTo) => dayjs(dateTo).diff(dayjs(dateFrom));
 
-  const diff = dayjs.duration(end.diff(start));
+const calculateDuration = (dateFrom, dateTo) => {
+  const diff = dayjs.duration(getDurationInMs(dateFrom, dateTo));
   const days = diff.days();
   const hours = diff.hours();
   const minutes = diff.minutes();
@@ -71,4 +70,6 @@ function updateItem(eventsData, updatedItem) {
   );
 }
 
-export {getRandomArrayElement, getRandomSentences, getRandomInteger, getRandomArray, humanizeTaskDateTime, calculateDuration, isEventInFuture, isCurrentDayInRange, isEventExpired, updateItem};
+const isEscapeKey = (evt) => evt.key === 'Escape';
+
+export {getRandomArrayElement, getRandomSentences, getRandomInteger, getRandomArray, humanizeTaskDateTime, calculateDuration, isEventInFuture, isCurrentDayInRange, isEventExpired, updateItem, getDurationInMs, isEscapeKey};
