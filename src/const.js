@@ -14,4 +14,10 @@ const MessageListEmpty = {
   FUTURE: 'There are no future events now'
 };
 
-export {TYPES_POINT, FilterType, MessageListEmpty };
+const SortType = {
+  DAY: 'day',
+  TIME: 'time',
+  PRICE: 'price'
+};
+
+export {TYPES_POINT, FilterType, MessageListEmpty, SortType };
