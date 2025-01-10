@@ -1,13 +1,18 @@
-import AbstractView from '../../framework/view/abstract-view.js';
+import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 import { humanizeTaskDateTime } from '../../utils/common.js';
 import { TYPES_POINT } from '../../const.js';
 
-function createEditableEventTemplate(event, destination, destinationsNames, offersByType) {
-  const { type, dateFrom, dateTo, basePrice, offers } = event;
+function createEditableEventTemplate(state) {
+  const { type, dateFrom, dateTo, basePrice, offers, currentDestination, destinationsNames, offersByType } = state;
 
   const departure = humanizeTaskDateTime(dateFrom);
   const arrival = humanizeTaskDateTime(dateTo);
-  const getStatusOffer = (id) => offers.includes(id) ? 'checked' : '';
+  const getStatusOffer = (id) => {
+    if (offers.length !== 0) {
+      return offers.includes(id) ? 'checked' : '';
+    }
+    return '';
+  };
   const getLastWordTitle = (title) => title.split(' ')[title.split(' ').length - 1];
   const getStatusType = (itemType) => itemType.toLowerCase() === type ? 'checked' : '';
 
@@ -38,7 +43,7 @@ ${TYPES_POINT.map((item) =>`
                     <label class="event__label  event__type-output" for="event-destination-1">
                     ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${currentDestination.name}" list="destination-list-1">
                     <datalist id="destination-list-1">
                     ${destinationsNames.map((city) =>`<option value="${city}"></option>`).join('')}
                     </datalist>
@@ -88,11 +93,11 @@ ${TYPES_POINT.map((item) =>`
 
                   <section class="event__section  event__section--destination">
                     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                    <p class="event__destination-description">${destination.description}</p>
+                    <p class="event__destination-description">${currentDestination.description}</p>
 
                     <div class="event__photos-container">
                       <div class="event__photos-tape">
-                      ${destination.pictures.map((picture) =>`
+                      ${currentDestination.pictures.map((picture) =>`
                         <img class="event__photo" src="${picture.src}" alt="${picture.description}">
                       `).join('')}
                       </div>
@@ -103,26 +108,26 @@ ${TYPES_POINT.map((item) =>`
   `;
 }
 
-export default class EditablePoint extends AbstractView {
+export default class EditablePoint extends AbstractStatefulView {
+  #event = {};
+  #offers = [];
+  #destinations = [];
   #handleFormSubmit = null;
   #handleCloseButtonClick = null;
 
-
-  constructor ({event, destination, destinationsNames, offersByType, onFormSubmit, onCloseButtonClick}) {
+  constructor ({event, allOffers, allDestinations, onFormSubmit, onCloseButtonClick}) {
     super();
-    this.event = event;
-    this.destination = destination;
-    this.destinationsNames = destinationsNames;
-    this.offersByType = offersByType;
+    this.#event = event;
+    this.#offers = allOffers;
+    this.#destinations = allDestinations;
     this.#handleFormSubmit = onFormSubmit;
     this.#handleCloseButtonClick = onCloseButtonClick;
-
-    this.element.addEventListener('submit', this.#formSubmitHandler);
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeButtonHandler);
+    this._setState(EditablePoint.parseEventToState(this.#event, this.#offers, this.#destinations));
+    this._restoreHandlers();
   }
 
   get template() {
-    return createEditableEventTemplate(this.event, this.destination, this.destinationsNames, this.offersByType);
+    return createEditableEventTemplate(this._state);
   }
 
   #formSubmitHandler = (evt) => {
@@ -134,4 +139,41 @@ export default class EditablePoint extends AbstractView {
     evt.preventDefault();
     this.#handleCloseButtonClick();
   };
+
+  #eventTypeHandler = (evt) => {
+    this.updateElement({
+      type: evt.target.value,
+      offersByType: this.#offers.getOffersByType(evt.target.value),
+      offers: []
+    });
+  };
+
+  #destinationChangeHandler = (evt) => {
+    this.updateElement({
+      currentDestination: this.#destinations.getDestinationByName(evt.target.value),
+    });
+  };
+
+  _restoreHandlers() {
+    this.element.addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeButtonHandler);
+    this.element.querySelector('.event__type-group').addEventListener('change', this.#eventTypeHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
+  }
+
+  reset = () => {
+    this._setState(EditablePoint.parseEventToState(this.#event, this.#offers, this.#destinations));
+    this.updateElement(this._state);
+  };
+
+  static parseEventToState(event, offers, destinations) {
+    const offersByType = offers.getOffersByType(event.type);
+
+    return {...event,
+      offersByType: offersByType,
+      selectedOffers: offers.getCurrentOffers(offersByType, event),
+      currentDestination: destinations.getDestinationById(event.destination),
+      destinationsNames: destinations.destinationsNames
+    };
+  }
 }
