@@ -1,6 +1,9 @@
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 import { humanizeTaskDateTime } from '../../utils/common.js';
 import { TYPES_POINT } from '../../const.js';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
 
 function createEditableEventTemplate(state) {
   const { type, dateFrom, dateTo, basePrice, offers, currentDestination, destinationsNames, offersByType } = state;
@@ -40,10 +43,10 @@ ${TYPES_POINT.map((item) =>`
                   </div>
 
                   <div class="event__field-group  event__field-group--destination">
-                    <label class="event__label  event__type-output" for="event-destination-1">
+                    <label class="event__label  event__type-output" for="event-destination-${currentDestination.id}">
                     ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${currentDestination.name}" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="event-destination-${currentDestination.id}" type="text" name="event-destination" value="${currentDestination.name}" list="destination-list-1">
                     <datalist id="destination-list-1">
                     ${destinationsNames.map((city) =>`<option value="${city}"></option>`).join('')}
                     </datalist>
@@ -114,6 +117,8 @@ export default class EditablePoint extends AbstractStatefulView {
   #destinations = [];
   #handleFormSubmit = null;
   #handleCloseButtonClick = null;
+  #datepickerFrom = null;
+  #datepickerTo = null;
 
   constructor ({event, allOffers, allDestinations, onFormSubmit, onCloseButtonClick}) {
     super();
@@ -130,9 +135,60 @@ export default class EditablePoint extends AbstractStatefulView {
     return createEditableEventTemplate(this._state);
   }
 
+  removeElement() {
+    super.removeElement();
+    if (this.#datepickerFrom || this.#datepickerTo) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerTo.destroy();
+      this.#datepickerFrom = null;
+      this.#datepickerTo = null;
+    }
+  }
+
+  #dateFromCloseHandler = ([userDate]) => {
+    this._setState({...this._state, dateFrom: userDate});
+    this.#datepickerTo.set('minDate', this._state.dateFrom);
+  };
+
+  #dateToCloseHandler = ([userDate]) => {
+    this._setState({...this._state, dateTo: userDate});
+    this.#datepickerFrom.set('maxDate', this._state.dateTo);
+  };
+
+  #setDatepicker() {
+    const [dateFromElement, dateToElement] = this.element.querySelectorAll('.event__input--time');
+    const commonConfig = {
+      dateFormat: 'd/m/y H:i',
+      enableTime: true,
+      locale: {firstDayOfWeek: 1},
+      'time_24hr':true
+    };
+
+    this.#datepickerFrom = flatpickr(
+      dateFromElement,
+      {
+        ...commonConfig,
+        defaultDate: this._state.dateFrom,
+        onClose: this.#dateFromCloseHandler,
+        maxDate: this._state.dateTo
+      }
+    );
+
+    this.#datepickerTo = flatpickr(
+      dateToElement,
+      {
+        ...commonConfig,
+        defaultDate: this._state.dateTo,
+        onClose: this.#dateToCloseHandler,
+        minDate: this._state.dateFrom
+      }
+    );
+  }
+
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit();
+    this.#handleFormSubmit(EditablePoint.parseStateToEvent(this._state));
+    this._state = null;
   };
 
   #closeButtonHandler = (evt) => {
@@ -159,6 +215,7 @@ export default class EditablePoint extends AbstractStatefulView {
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeButtonHandler);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#eventTypeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
+    this.#setDatepicker();
   }
 
   reset = () => {
@@ -175,5 +232,12 @@ export default class EditablePoint extends AbstractStatefulView {
       currentDestination: destinations.getDestinationById(event.destination),
       destinationsNames: destinations.destinationsNames
     };
+  }
+
+  static parseStateToEvent(state) {
+    const updatedEvent = {...state,
+      destination: state.currentDestination.id
+    };
+    return updatedEvent;
   }
 }

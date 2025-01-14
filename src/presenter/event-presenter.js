@@ -94,9 +94,10 @@ export default class EventPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #formSubmitHandler = () => {
+  #formSubmitHandler = (updatedEvent) => {
     this.#closeEditForm();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.updateEventData(updatedEvent);
   };
 
   #closeButtonClickHandler = () => {
