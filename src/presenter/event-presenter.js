@@ -31,11 +31,10 @@ export default class EventPresenter {
 
   init() {
     const offersByType = this.#offersModel.getOffersByType(this.#eventData.type);
+    //От pointInfo буду избавляться
     const pointInfo = {
-      offersByType: offersByType,
       selectedOffers: this.#offersModel.getCurrentOffers(offersByType, this.#eventData),
       destination: this.#destinationsModel.getDestinationById(this.#eventData.destination),
-      destinationsNames: this.#destinationsModel.destinationsNames,
     };
 
     this.#renderEvent(this.#eventData, pointInfo);
@@ -53,9 +52,8 @@ export default class EventPresenter {
 
     this.#editablePointComponent = new EditablePoint({
       event: event,
-      destination: info.destination,
-      destinationsNames: info.destinationsNames,
-      offersByType: info.offersByType,
+      allOffers: this.#offersModel,
+      allDestinations: this.#destinationsModel,
       onFormSubmit: this.#formSubmitHandler,
       onCloseButtonClick: this.#closeButtonClickHandler
     });
@@ -74,6 +72,7 @@ export default class EventPresenter {
   }
 
   #closeEditForm () {
+    this.#editablePointComponent.reset();
     this.#isOpenEditForm = false;
     replace(this.#eventPointComponent, this.#editablePointComponent);
   }
