@@ -1,7 +1,8 @@
 import EventPoint from '../view/trip-events/event-point-view.js';
 import EditablePoint from '../view/trip-events/edit-event-point-view.js';
 import { render, replace, remove } from '../framework/render.js';
-import { isEscapeKey } from '../utils/common.js';
+import { isEscapeKey, getUpdateType } from '../utils/common.js';
+import {UserAction, UpdateType} from '../const.js';
 
 export default class EventPresenter {
   #container = null;
@@ -10,34 +11,28 @@ export default class EventPresenter {
   #eventData = {};
   #eventPointComponent = null;
   #editablePointComponent = null;
-  #onFavoriteButtonClick = null;
+  #handleDataChange = null;
   #onPointStateChange = null;
   #isOpenEditForm = false;
 
-  constructor({container, destinationsModel, offersModel,eventData, onFavoriteButtonClick, onPointStateChange}) {
+  constructor({container, destinationsModel, offersModel,eventData, onDataChange, onPointStateChange}) {
     this.#container = container;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#eventData = eventData;
-    this.#onFavoriteButtonClick = onFavoriteButtonClick;
+    this.#handleDataChange = onDataChange;
     this.#onPointStateChange = onPointStateChange;
   }
 
-  updateEventData(updatedEventData) {
-    this.#eventData = updatedEventData;
-    remove(this.#eventPointComponent);
-    this.init();
-  }
-
-  init() {
-    const offersByType = this.#offersModel.getOffersByType(this.#eventData.type);
+  init(eventData) {
+    const offersByType = this.#offersModel.getOffersByType(eventData.type);
     //От pointInfo буду избавляться
     const pointInfo = {
-      selectedOffers: this.#offersModel.getCurrentOffers(offersByType, this.#eventData),
-      destination: this.#destinationsModel.getDestinationById(this.#eventData.destination),
+      selectedOffers: this.#offersModel.getCurrentOffers(offersByType, eventData),
+      destination: this.#destinationsModel.getDestinationById(eventData.destination),
     };
 
-    this.#renderEvent(this.#eventData, pointInfo);
+    this.#renderEvent(eventData, pointInfo);
   }
 
   #renderEvent (event, info) {
@@ -55,7 +50,8 @@ export default class EventPresenter {
       allOffers: this.#offersModel,
       allDestinations: this.#destinationsModel,
       onFormSubmit: this.#formSubmitHandler,
-      onCloseButtonClick: this.#closeButtonClickHandler
+      onCloseButtonClick: this.#closeButtonClickHandler,
+      onDeleteClick: this.#handleDeleteClick
     });
 
     if (this.#isOpenEditForm) {
@@ -78,7 +74,11 @@ export default class EventPresenter {
   }
 
   #toggleFavoriteStatus = () => {
-    this.#onFavoriteButtonClick({...this.#eventData, isFavorite: !this.#eventData.isFavorite});
+    this.#handleDataChange(
+      UserAction.UPDATE_EVENT,
+      UpdateType.MINOR,
+      {...this.#eventData, isFavorite: !this.#eventData.isFavorite},
+    );
   };
 
   #escKeyDownHandler = (evt) => {
@@ -95,9 +95,12 @@ export default class EventPresenter {
   };
 
   #formSubmitHandler = (updatedEvent) => {
+    this.#handleDataChange(
+      UserAction.UPDATE_EVENT,
+      getUpdateType(updatedEvent, this.#eventData) ? UpdateType.MINOR : UpdateType.PATCH,
+      updatedEvent,
+    );
     this.#closeEditForm();
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.updateEventData(updatedEvent);
   };
 
   #closeButtonClickHandler = () => {
@@ -110,4 +113,17 @@ export default class EventPresenter {
       this.#closeEditForm();
     }
   }
+
+  destroy() {
+    remove(this.#eventPointComponent);
+    remove(this.#editablePointComponent);
+  }
+
+  #handleDeleteClick = (event) => {
+    this.#handleDataChange(
+      UserAction.DELETE_EVENT,
+      UpdateType.MINOR,
+      event,
+    );
+  };
 }

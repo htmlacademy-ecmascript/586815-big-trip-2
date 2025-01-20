@@ -1,17 +1,17 @@
 import AbstractView from '../../framework/view/abstract-view.js';
-import { humanizeTaskDateTime, calculateDuration } from '../../utils/common.js';
+import { humanizeTaskDateTime } from '../../utils/common.js';
 
 function createEventPointTemplate(event, cityName, selectedOffers) {
-  const { basePrice, type, dateFrom, dateTo, isFavorite } = event;
+  const { basePrice, type, dateFrom, dateTo, isFavorite, duration} = event;
 
   const departure = humanizeTaskDateTime(dateFrom);
   const arrival = humanizeTaskDateTime(dateTo);
-  const diffDuration = calculateDuration(dateFrom, dateTo);
   const favoriteClassName = isFavorite
     ? 'event__favorite-btn event__favorite-btn--active'
     : 'event__favorite-btn';
 
   return `
+  <li class="trip-events__item">
   <div class="event">
                 <time class="event__date" datetime="${departure.dateFull}">${departure.date}</time>
                 <div class="event__type">
@@ -24,7 +24,7 @@ function createEventPointTemplate(event, cityName, selectedOffers) {
                     &mdash;
                     <time class="event__end-time" datetime="${arrival.dateTimeFull}">${arrival.time}</time>
                   </p>
-                  <p class="event__duration">${diffDuration}</p>
+                  <p class="event__duration">${duration}</p>
                 </div>
                 <p class="event__price">
                   &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
@@ -48,11 +48,13 @@ function createEventPointTemplate(event, cityName, selectedOffers) {
                   <span class="visually-hidden">Open event</span>
                 </button>
               </div>
+              </li>
   `;
 }
 
 export default class EventPoint extends AbstractView {
   #event = null;
+  #duration = null;
   #handleOpenButtonClick = null;
   #handleFavoriteButtonClick = null;
 
