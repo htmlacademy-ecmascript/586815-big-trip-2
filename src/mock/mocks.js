@@ -200,8 +200,8 @@ const points = [
   {
     id: '1',
     basePrice: 1100,
-    dateFrom: '2019-03-10T22:55:56.845Z',
-    dateTo: '2019-03-11T11:22:13.375Z',
+    dateFrom: '2025-03-10T22:55:56.845Z',
+    dateTo: '2025-03-11T11:22:13.375Z',
     destination: getRandomDestination(destinations).id,
     isFavorite: false,
     offers: [
