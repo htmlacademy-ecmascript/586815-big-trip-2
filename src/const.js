@@ -1,17 +1,19 @@
+import { nanoid } from 'nanoid';
+
 const TYPES_POINT = [ 'Taxi', 'Bus', 'Train', 'Ship', 'Drive', 'Flight', 'Check-in', 'Sightseeing', 'Restaurant'];
 
 const FilterType = {
-  EVERYTHING: 'Everything',
-  FUTURE: 'Future',
-  PRESENT: 'Present ',
-  PAST: 'Past'
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present ',
+  PAST: 'past'
 };
 
 const MessageListEmpty = {
-  EVERYTHING: 'Click New Event to create your first point',
-  PAST: 'There are no past events now',
-  PRESENT: 'There are no present events now',
-  FUTURE: 'There are no future events now'
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.PAST]: 'There are no past events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.FUTURE]: 'There are no future events now'
 };
 
 const SortType = {
@@ -20,4 +22,27 @@ const SortType = {
   PRICE: 'price'
 };
 
-export {TYPES_POINT, FilterType, MessageListEmpty, SortType };
+const UserAction = {
+  UPDATE_EVENT: 'UPDATE_EVENT',
+  ADD_EVENT: 'ADD_EVENT',
+  DELETE_EVENT: 'DELETE_EVENT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const newEventPointData = {
+  id: nanoid(),
+  type: 'flight',
+  destination: '',
+  dateFrom: '',
+  dateTo: '',
+  basePrice: '0',
+  isFavorite: false,
+  offers: []
+};
+
+export {TYPES_POINT, FilterType, MessageListEmpty, SortType, UserAction, UpdateType, newEventPointData };

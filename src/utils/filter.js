@@ -13,8 +13,9 @@ function generateFilter(events) {
     ([filterType, filterEvents]) => ({
       type: filterType,
       count: filterEvents(events).length,
+      currentEvents: filterEvents
     }),
   );
 }
 
-export { generateFilter };
+export { generateFilter, filter };
