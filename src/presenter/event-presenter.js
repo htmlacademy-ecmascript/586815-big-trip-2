@@ -32,10 +32,6 @@ export default class EventPresenter {
   init(eventData) {
     this.#eventData = eventData;
     const offersByType = this.#offersModel.getOffersByType(this.#eventData.type);
-    // //От pointInfo буду избавляться
-    // const pointInfo = {
-    //   selectedOffers: this.#offersModel.getCurrentOffers(offersByType, eventData),
-    // };
     this.#renderEvent(this.#eventData, offersByType);
   }
 

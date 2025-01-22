@@ -6,7 +6,7 @@ export default class eventsModel extends Observable {
   #events = [];
 
   init(points) {
-    this.#events = this.#addDurationToEvents(points.map(this.#adaptPointToClient));
+    this.#events = this.#addDurationToEvents(points.map(this.#adaptToClient));
 
     this._notify(UpdateType.INIT);
   }
@@ -15,7 +15,7 @@ export default class eventsModel extends Observable {
     return this.#events;
   }
 
-  #adaptPointToClient(point) {
+  #adaptToClient(point) {
     const adaptedPoint = {...point,
       basePrice: point['base_price'],
       dateFrom: point['date_from'] !== null ? new Date(point['date_from']) : point['date_from'] ,

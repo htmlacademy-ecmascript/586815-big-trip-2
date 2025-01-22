@@ -14,13 +14,13 @@ const tripHeaderContainer = document.querySelector('.trip-main');
 const tripFiltersContainer = tripHeaderContainer.querySelector('.trip-controls__filters');
 const tripEventsContainer = document.querySelector('.trip-events');
 const newEventButtonComponent = tripHeaderContainer.querySelector('.trip-main__event-add-btn');
-const tripInfoPresenter = new TripInfoPresenter({container: tripHeaderContainer});
 const mainApiServiceComponent = new MainApiService(END_POINT, AUTHORIZATION);
 
 const eventsModel = new EventsModel();
 const destinationsModel = new DestinationsModel();
 const offersModel = new OffersModel();
 const filterModel = new FilterModel();
+const tripInfoPresenter = new TripInfoPresenter({container: tripHeaderContainer, eventsModel, offersModel});
 
 MainApiService.fetchAllData(mainApiServiceComponent).then((response) => {
   const { points, destinations, offers} = response;
@@ -31,6 +31,7 @@ MainApiService.fetchAllData(mainApiServiceComponent).then((response) => {
   console.error('Error fetching data:', error);// eslint-disable-line no-console
 }).finally(() => {
   newEventButtonComponent.disabled = false;
+  tripInfoPresenter.init();
 });
 
 const tripEventsPresenter = new TripEventsPresenter({
@@ -44,19 +45,6 @@ const tripEventsPresenter = new TripEventsPresenter({
 
 const tripFiltersPresenter = new TripFiltersPresenter({container: tripFiltersContainer, filterModel, eventsModel});
 
-// eventsModel.init()
-//   .finally(() => {
-//     newEventButtonComponent.disabled = false;
-//   });
-// destinationsModel.init()
-//   .finally(() => {
-//     eventsModel.init()
-//       .finally(() => {
-//         newEventButtonComponent.disabled = false;
-//       });
-//   });
-// offersModel.init();
-tripInfoPresenter.init();
 tripFiltersPresenter.init();
 tripEventsPresenter.init();
 newEventButtonComponent.addEventListener('click', handleNewEventButtonClick);

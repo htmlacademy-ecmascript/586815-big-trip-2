@@ -27,8 +27,6 @@ export default class TripFiltersPresenter {
   }
 
   init() {
-    // render(new TripFilters({filters: this.#filters}), this.#container);
-
     const filters = this.filters;
     const prevFilterComponent = this.#filterComponent;
     this.#filterComponent = new TripFilters({
