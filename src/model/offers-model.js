@@ -1,15 +1,8 @@
-import { offersList } from '../mock/mocks.js';
-
-
 export default class OffersModel {
   #offers = [];
 
-  constructor () {
-    this.#offers = [];
-  }
-
-  init () {
-    this.#offers = offersList;
+  init(offers) {
+    this.#offers = offers;
   }
 
   getDestinations () {

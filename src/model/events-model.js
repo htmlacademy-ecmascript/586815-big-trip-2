@@ -1,19 +1,33 @@
-import {randomPoints} from '../mock/mocks.js';
 import Observable from '../framework/observable.js';
 import { calculateDuration } from '../utils/common.js';
-
-const EVENT_COUNT = 3;
+import { UpdateType } from '../const.js';
 
 export default class eventsModel extends Observable {
   #events = [];
 
-  constructor () {
-    super();
-    this.#events = this.#addDurationToEvents(randomPoints.splice(0, EVENT_COUNT));
+  init(points) {
+    this.#events = this.#addDurationToEvents(points.map(this.#adaptPointToClient));
+
+    this._notify(UpdateType.INIT);
   }
 
   get events() {
     return this.#events;
+  }
+
+  #adaptPointToClient(point) {
+    const adaptedPoint = {...point,
+      basePrice: point['base_price'],
+      dateFrom: point['date_from'] !== null ? new Date(point['date_from']) : point['date_from'] ,
+      dateTo: point['date_to'] !== null ? new Date(point['date_to']) : point['date_to'],
+      isFavorite: point['is_favorite'],
+    };
+
+    delete adaptedPoint['base_price'];
+    delete adaptedPoint['date_from'];
+    delete adaptedPoint['date_to'];
+    delete adaptedPoint['is_favorite'];
+    return adaptedPoint;
   }
 
   #addDurationToEvents(events) {

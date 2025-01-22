@@ -30,25 +30,23 @@ export default class EventPresenter {
   }
 
   init(eventData) {
-    const offersByType = this.#offersModel.getOffersByType(eventData.type);
-    //От pointInfo буду избавляться
-    const pointInfo = {
-      selectedOffers: this.#offersModel.getCurrentOffers(offersByType, eventData),
-      destination: this.#destinationsModel.getDestinationById(eventData.destination),
-    };
-
     this.#eventData = eventData;
-    this.#renderEvent(eventData, pointInfo);
+    const offersByType = this.#offersModel.getOffersByType(this.#eventData.type);
+    // //От pointInfo буду избавляться
+    // const pointInfo = {
+    //   selectedOffers: this.#offersModel.getCurrentOffers(offersByType, eventData),
+    // };
+    this.#renderEvent(this.#eventData, offersByType);
   }
 
-  #renderEvent (event, info) {
+  #renderEvent (event, offersByType) {
     const prevEventPointComponent = this.#eventPointComponent;
     const prevEditablePointComponent = this.#editablePointComponent;
 
     this.#eventPointComponent = new EventPoint({
       event: event,
-      selectedOffers: info.selectedOffers,
-      cityName: info.destination.name,
+      selectedOffers: this.#offersModel.getCurrentOffers(offersByType, event),
+      cityName: this.#destinationsModel.getDestinationById(event.destination).name,
       onOpenButtonClick: this.#openButtonClickHandler,
       onFavoriteButtonClick: this.#toggleFavoriteStatus
     });
