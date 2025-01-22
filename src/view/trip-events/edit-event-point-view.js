@@ -223,10 +223,12 @@ export default class EditablePoint extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._state.basePrice = this.#getBasePrice();
+    this.updateElement({
+      basePrice: Number(this.#getBasePrice()),
+      destination: this._state.currentDestination.id,
+    });
     this.#isNewEvent = false;
     this.#handleFormSubmit(EditablePoint.parseStateToEvent(this._state));
-    this._state = null;
   };
 
   #closeButtonHandler = (evt) => {
@@ -288,7 +290,6 @@ export default class EditablePoint extends AbstractStatefulView {
 
   static parseStateToEvent(state) {
     return{...state,
-      destination: state.currentDestination.id,
       duration: calculateDuration(state.dateFrom, state.dateTo)
     };
   }

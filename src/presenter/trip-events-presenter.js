@@ -1,6 +1,5 @@
 import TripSort from '../view/trip-sort-view.js';
 import EventList from '../view/trip-events/list-view.js';
-// import EventItem from '../view/trip-events/item-view.js';
 import { render, remove } from '../framework/render.js';
 import { UpdateType, UserAction } from '../const.js';
 import ListEmptyMessageView from '../view/trip-events/list-empty-view.js';
@@ -18,7 +17,6 @@ export default class TripEventsPresenter {
   #destinationsModel = null;
   #offersModel = null;
   #eventListComponent = new EventList();
-  #eventItem = null;
   #eventsData = [];
   #presentersPoints = new Map();
   #currentSortType = SortType.DAY;
@@ -138,7 +136,6 @@ export default class TripEventsPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#presentersPoints.get(data.id).destroy();
         this.#presentersPoints.get(data.id).init(data);
         break;
       case UpdateType.MINOR:

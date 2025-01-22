@@ -54,7 +54,6 @@ function createEventPointTemplate(event, cityName, selectedOffers) {
 
 export default class EventPoint extends AbstractView {
   #event = null;
-  #duration = null;
   #handleOpenButtonClick = null;
   #handleFavoriteButtonClick = null;
 
