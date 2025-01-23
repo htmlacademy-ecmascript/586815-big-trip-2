@@ -94,12 +94,10 @@ export default class TripInfoPresenter {
     this.#cost = 0;
     this.#eventsModel.events.forEach((event) => {
       this.#cost += event.basePrice;
-      event.offers.forEach(() => {
-        const offersByType = this.#offersModel.getOffersByType(event.type);
-        const selectedOffers = this.#offersModel.getCurrentOffers(offersByType, event);
-        selectedOffers.forEach((item) => {
-          this.#cost += item.price;
-        });
+      const offersByType = this.#offersModel.getOffersByType(event.type);
+      const selectedOffers = this.#offersModel.getCurrentOffers(offersByType, event);
+      selectedOffers.forEach((item) => {
+        this.#cost += item.price;
       });
     }
     );
