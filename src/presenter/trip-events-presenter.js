@@ -48,8 +48,8 @@ export default class TripEventsPresenter {
   }
 
   init() {
+    remove(this.#sortComponent);
     this.#eventsData = this.events;
-
     this.#renderEvents();
   }
 
@@ -128,7 +128,6 @@ export default class TripEventsPresenter {
     remove(this.#sortComponent);
     remove(this.#eventListComponent);
     remove(this.#loadingComponent);
-
     if (this.#noEventComponent) {
       remove(this.#noEventComponent);
     }

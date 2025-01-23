@@ -31,7 +31,8 @@ const humanizeTaskDateTime = (dueDate) =>
     dateFull: dayjs(dueDate).format('YYYY-MM-DD'),
     date: dayjs(dueDate).format('MMM D'),
     time: dayjs(dueDate).format('HH:mm'),
-    editableDate: dayjs(dueDate).format('DD/MM/YY HH:mm')
+    editableDate: dayjs(dueDate).format('DD/MM/YY HH:mm'),
+    dateMainInfo: dayjs(dueDate).format('D MMM'),
   } : '';
 
 function getRandomArrayElement(items) {

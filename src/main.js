@@ -20,7 +20,7 @@ const eventsModel = new EventsModel();
 const destinationsModel = new DestinationsModel();
 const offersModel = new OffersModel();
 const filterModel = new FilterModel();
-const tripInfoPresenter = new TripInfoPresenter({container: tripHeaderContainer, eventsModel, offersModel});
+new TripInfoPresenter({container: tripHeaderContainer, eventsModel, offersModel, destinationsModel});
 
 MainApiService.fetchAllData(mainApiServiceComponent).then((response) => {
   const { points, destinations, offers} = response;
@@ -31,7 +31,6 @@ MainApiService.fetchAllData(mainApiServiceComponent).then((response) => {
   console.error('Error fetching data:', error);// eslint-disable-line no-console
 }).finally(() => {
   newEventButtonComponent.disabled = false;
-  tripInfoPresenter.init();
 });
 
 const tripEventsPresenter = new TripEventsPresenter({
@@ -52,6 +51,9 @@ newEventButtonComponent.disabled = true;
 
 function handleNewEventFormClose() {
   newEventButtonComponent.disabled = false;
+  if (eventsModel.events.length === 0) {
+    tripEventsPresenter.init();
+  }
 }
 
 function handleNewEventButtonClick() {
