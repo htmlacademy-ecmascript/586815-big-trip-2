@@ -93,7 +93,7 @@ ${TYPES_POINT.map((item) =>`
                     <label class="event__label  event__type-output" for="event-destination-${destination}">
                     ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-${destination}" type="text" name="event-destination" value="${currentDestination ? currentDestination.name : ''}" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="event-destination-${destination}" type="text" name="event-destination" value="${currentDestination ? currentDestination.name : ''}" list="destination-list-1" required>
                     <datalist id="destination-list-1">
                     ${destinationsNames.map((city) =>`<option value="${he.encode(city)}"></option>`).join('')}
                     </datalist>
@@ -101,10 +101,10 @@ ${TYPES_POINT.map((item) =>`
 
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${!isNewEvent ? departure.editableDate : ''}">
+                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${!isNewEvent ? departure.editableDate : ''}" required>
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-1">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${!isNewEvent ? arrival.editableDate : ''}">
+                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${!isNewEvent ? arrival.editableDate : ''}" required>
                   </div>
 
                   <div class="event__field-group  event__field-group--price">
@@ -193,6 +193,7 @@ export default class EditablePoint extends AbstractStatefulView {
         dateFromElement,
         {
           ...commonConfig,
+          defaultDate: this._state.dateFrom ,
           onClose: this.#dateFromCloseHandler,
         }
       );
@@ -201,6 +202,7 @@ export default class EditablePoint extends AbstractStatefulView {
         dateToElement,
         {
           ...commonConfig,
+          defaultDate: this._state.dateTo,
           onClose: this.#dateToCloseHandler,
         }
       );
@@ -230,10 +232,9 @@ export default class EditablePoint extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.updateElement({
-      basePrice: Number(this.#getBasePrice()),
-      destination: this._state.currentDestination.id,
-    });
+    if (!this._state.dateFrom || !this._state.dateTo) {
+      return;
+    }
     this.#isNewEvent = false;
     this.#handleFormSubmit(EditablePoint.parseStateToEvent(this._state));
   };
@@ -255,25 +256,32 @@ export default class EditablePoint extends AbstractStatefulView {
     const offerId = evt.target.dataset.id;
     const isChecked = evt.target.checked;
 
-    this.updateElement({
+    this._setState({...this._state,
       offers: isChecked ? [...this._state.offers, offerId] : this._state.offers.filter((offer) => offer !== offerId)
     });
   };
 
-  #getBasePrice = () => this.element.querySelector('.event__input--price').value;
+  #priceChangeHandler = (evt) => {
+    this._setState({...this._state,
+      basePrice: Number(evt.target.value),
+    });
+  };
 
   #destinationChangeHandler = (evt) => {
     this.updateElement({
-      currentDestination: evt.target.value ? this.#destinations.getDestinationByName(evt.target.value) : '',
+      currentDestination: this.#destinations.getCurrentDestination(evt.target.value).currentDestination,
+      destination: this.#destinations.getCurrentDestination(evt.target.value).id,
     });
   };
 
   _restoreHandlers() {
+    this.#setDatepicker();
     this.element.addEventListener('submit', this.#formSubmitHandler);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#eventTypeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
 
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
     if (!this.#isNewEvent) {
       this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeButtonHandler);
     }
@@ -281,7 +289,6 @@ export default class EditablePoint extends AbstractStatefulView {
       this.element.querySelectorAll('.event__offer-checkbox')
         .forEach((checkbox) => checkbox.addEventListener('change', this.#offerChangeHandler));
     }
-    this.#setDatepicker();
   }
 
   reset = () => {

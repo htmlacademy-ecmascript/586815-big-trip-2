@@ -69,8 +69,7 @@ const isCostChanged = (previousEvents, currentEvents, offersModel) => {
 
     for (let j = 0; j < prevOffers.length; j++) {
       if (
-        prevOffers[j].id !== currOffers[j].id ||
-        prevOffers[j].price !== currOffers[j].price
+        prevOffers[j].id !== currOffers[j].id
       ) {
         return true;
       }

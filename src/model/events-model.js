@@ -6,7 +6,7 @@ export default class eventsModel extends Observable {
   #events = [];
 
   init(points) {
-    this.#events = this.#addDurationToEvents(points.map(this.#adaptToClient).slice(0, 3));
+    this.#events = this.#addDurationToEvents(points.map(this.#adaptToClient));
 
     this._notify(UpdateType.INIT);
   }

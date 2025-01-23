@@ -85,6 +85,9 @@ export default class TripInfoPresenter {
   #destroy = () => {
     remove(this.#mainContainerComponent);
     remove(this.#containerComponent);
+    this.#costComponent = null;
+    this.#tripDestinationsComponent = null;
+    this.#periodComponent = null;
   };
 
   #getChangeCost = () => {
