@@ -33,7 +33,6 @@ export default class eventsModel extends Observable {
       ...adaptedPoint,
       duration: calculateDuration(adaptedPoint.dateFrom, adaptedPoint.dateTo),
     };
-    // this.#addDurationToEvents(adaptedPoint);
 
     delete adaptedPoint['base_price'];
     delete adaptedPoint['date_from'];
@@ -65,8 +64,6 @@ export default class eventsModel extends Observable {
         updatedEvent,
         ...this.#events.slice(index + 1),
       ];
-
-      // this.#events = this.#addDurationToEvents(this.#events);
 
       this._notify(updateType, updatedEvent);
     } catch(err) {
