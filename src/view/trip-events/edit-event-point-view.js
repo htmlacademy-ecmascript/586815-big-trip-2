@@ -4,6 +4,7 @@ import { TYPES_POINT } from '../../const.js';
 import flatpickr from 'flatpickr';
 import { calculateDuration } from '../../utils/common.js';
 import he from 'he';
+import { nanoid } from 'nanoid';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -232,9 +233,18 @@ export default class EditablePoint extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
+
     if (!this._state.dateFrom || !this._state.dateTo) {
       return;
     }
+
+    if (this.#isNewEvent) {
+      this._setState({
+        ...this._state,
+        id: nanoid(),
+      });
+    }
+
     this.#isNewEvent = false;
     this.#handleFormSubmit(EditablePoint.parseStateToEvent(this._state));
   };

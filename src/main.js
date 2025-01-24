@@ -16,7 +16,9 @@ const tripEventsContainer = document.querySelector('.trip-events');
 const newEventButtonComponent = tripHeaderContainer.querySelector('.trip-main__event-add-btn');
 const mainApiServiceComponent = new MainApiService(END_POINT, AUTHORIZATION);
 
-const eventsModel = new EventsModel();
+const eventsModel = new EventsModel({
+  mainApiService: mainApiServiceComponent
+});
 const destinationsModel = new DestinationsModel();
 const offersModel = new OffersModel();
 const filterModel = new FilterModel();

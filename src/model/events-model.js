@@ -4,9 +4,15 @@ import { UpdateType } from '../const.js';
 
 export default class eventsModel extends Observable {
   #events = [];
+  #mainApiService = null;
+
+  constructor({mainApiService}) {
+    super();
+    this.#mainApiService = mainApiService;
+  }
 
   init(points) {
-    this.#events = this.#addDurationToEvents(points.map(this.#adaptToClient).slice(0, 1));
+    this.#events = this.#addDurationToEvents(points.map(this.#adaptToClient));
 
     this._notify(UpdateType.INIT);
   }
@@ -37,18 +43,27 @@ export default class eventsModel extends Observable {
     }));
   }
 
-  updateEvent(updateType, update) {
+  async updateEvent(updateType, update) {
     const index = this.#events.findIndex((event) => event.id === update.id);
+
     if (index === -1) {
       throw new Error('Can\'t update unexisting event');
     }
-    this.#events = [
-      ...this.#events.slice(0, index),
-      update,
-      ...this.#events.slice(index + 1),
-    ];
 
-    this._notify(updateType, update);
+    try {
+      const response = await this.#mainApiService.updatePoint(update);
+      const updatedEvent = this.#adaptToClient(response);
+
+      this.#events = [
+        ...this.#events.slice(0, index),
+        updatedEvent,
+        ...this.#events.slice(index + 1),
+      ];
+
+      this._notify(updateType, updatedEvent);
+    } catch(err) {
+      throw new Error('Can\'t update event');
+    }
   }
 
   addEvent(updateType, update) {

@@ -1,5 +1,3 @@
-import { nanoid } from 'nanoid';
-
 const TYPES_POINT = [ 'Taxi', 'Bus', 'Train', 'Ship', 'Drive', 'Flight', 'Check-in', 'Sightseeing', 'Restaurant'];
 
 const FilterType = {
@@ -36,7 +34,7 @@ const UpdateType = {
 };
 
 const newEventPointData = {
-  id: nanoid(),
+  id: '',
   type: 'flight',
   destination: '',
   dateFrom: '',
