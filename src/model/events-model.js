@@ -1,7 +1,6 @@
 import Observable from '../framework/observable.js';
 import { calculateDuration } from '../utils/common.js';
 import { UpdateType } from '../const.js';
-import { duration } from 'dayjs';
 
 export default class eventsModel extends Observable {
   #events = [];
