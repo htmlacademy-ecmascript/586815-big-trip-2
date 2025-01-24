@@ -1,6 +1,7 @@
 import Observable from '../framework/observable.js';
 import { calculateDuration } from '../utils/common.js';
 import { UpdateType } from '../const.js';
+import { duration } from 'dayjs';
 
 export default class eventsModel extends Observable {
   #events = [];
@@ -18,7 +19,7 @@ export default class eventsModel extends Observable {
   }
 
   get events() {
-    return this.#events;
+    return this.#addDurationToEvents(this.#events);
   }
 
   #adaptToClient(point) {
@@ -29,11 +30,17 @@ export default class eventsModel extends Observable {
       isFavorite: point['is_favorite'],
     };
 
+    const adaptedEvent = {
+      ...adaptedPoint,
+      duration: calculateDuration(adaptedPoint.dateFrom, adaptedPoint.dateTo),
+    };
+    // this.#addDurationToEvents(adaptedPoint);
+
     delete adaptedPoint['base_price'];
     delete adaptedPoint['date_from'];
     delete adaptedPoint['date_to'];
     delete adaptedPoint['is_favorite'];
-    return adaptedPoint;
+    return adaptedEvent;
   }
 
   #addDurationToEvents(events) {
@@ -59,6 +66,8 @@ export default class eventsModel extends Observable {
         updatedEvent,
         ...this.#events.slice(index + 1),
       ];
+
+      // this.#events = this.#addDurationToEvents(this.#events);
 
       this._notify(updateType, updatedEvent);
     } catch(err) {
