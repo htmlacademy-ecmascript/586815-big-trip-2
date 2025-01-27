@@ -4,6 +4,8 @@ import { TYPES_POINT } from '../../const.js';
 import flatpickr from 'flatpickr';
 import { calculateDuration } from '../../utils/common.js';
 import he from 'he';
+import { nanoid } from 'nanoid';
+import dayjs from 'dayjs';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -19,8 +21,8 @@ function createEditableEventTemplate(state, isNewEvent) {
     return '';
   };
 
-  const destinationInfo = () => {
-    if (currentDestination) {
+  const getDestinationInfo = () => {
+    if (currentDestination && currentDestination.description && currentDestination.pictures) {
       return `<section class="event__section  event__section--destination">
                     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
                     <p class="event__destination-description">${currentDestination.description}</p>
@@ -38,7 +40,31 @@ function createEditableEventTemplate(state, isNewEvent) {
     }
   };
 
-  const getLastWordTitle = (title) => title.split(' ')[title.split(' ').length - 1];
+  const getOffersByType = () => {
+    if (offersByType.offers.length !== 0) {
+      return `<section class="event__section  event__section--offers">
+                    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+
+                    <div class="event__available-offers">
+
+                      ${offersByType.offers.map((offer) =>
+    `<div class="event__offer-selector">
+                        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-${offer.id}" type="checkbox" name="event-offer-${offer.title}"
+                        data-id="${offer.id}"
+                        ${getStatusOffer(offer.id)}>
+                        <label class="event__offer-label" for="event-offer-${offer.title}-${offer.id}">
+                          <span class="event__offer-title">${offer.title}</span>
+                          &plus;&euro;&nbsp;
+                          <span class="event__offer-price">${offer.price}</span>
+                        </label>
+                      </div>`).join('')}
+                    </div>
+                  </section>`;
+    } else {
+      return '';
+    }
+  };
+
   const getStatusType = (itemType) => itemType.toLowerCase() === type ? 'checked' : '';
 
   return `
@@ -69,7 +95,7 @@ ${TYPES_POINT.map((item) =>`
                     <label class="event__label  event__type-output" for="event-destination-${destination}">
                     ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-${destination}" type="text" name="event-destination" value="${currentDestination ? currentDestination.name : ''}" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="event-destination-${destination}" type="text" name="event-destination" value="${currentDestination ? currentDestination.name : ''}" list="destination-list-1" required>
                     <datalist id="destination-list-1">
                     ${destinationsNames.map((city) =>`<option value="${he.encode(city)}"></option>`).join('')}
                     </datalist>
@@ -77,10 +103,10 @@ ${TYPES_POINT.map((item) =>`
 
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${!isNewEvent ? departure.editableDate : ''}">
+                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${!isNewEvent ? departure.editableDate : ''}" required>
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-1">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${!isNewEvent ? arrival.editableDate : ''}">
+                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${!isNewEvent ? arrival.editableDate : ''}" required>
                   </div>
 
                   <div class="event__field-group  event__field-group--price">
@@ -98,25 +124,8 @@ ${TYPES_POINT.map((item) =>`
                   </button>`}
                 </header>
                 <section class="event__details">
-                  <section class="event__section  event__section--offers">
-                    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-                    <div class="event__available-offers">
-
-                      ${offersByType.offers.map((offer) =>
-    `<div class="event__offer-selector">
-                        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${getLastWordTitle(offer.title)}-1" type="checkbox" name="event-offer-${getLastWordTitle(offer.title)}"
-                        ${getStatusOffer(offer.id)}>
-                        <label class="event__offer-label" for="event-offer-${getLastWordTitle(offer.title)}-1">
-                          <span class="event__offer-title">${offer.title}</span>
-                          &plus;&euro;&nbsp;
-                          <span class="event__offer-price">${offer.price}</span>
-                        </label>
-                      </div>`).join('')}
-
-                    </div>
-                  </section>
-                  ${ destinationInfo()}
+                ${getOffersByType()}
+                ${ getDestinationInfo()}
                 </section>
               </form>
               </li>
@@ -163,12 +172,14 @@ export default class EditablePoint extends AbstractStatefulView {
 
   #dateFromCloseHandler = ([userDate]) => {
     this._setState({...this._state, dateFrom: userDate});
-    this.#datepickerTo.set('minDate', this._state.dateFrom);
+    const minDateTo = dayjs(this._state.dateFrom).add(1, 'minute').toDate();
+    this.#datepickerTo.set('minDate', minDateTo);
   };
 
   #dateToCloseHandler = ([userDate]) => {
     this._setState({...this._state, dateTo: userDate});
-    this.#datepickerFrom.set('maxDate', this._state.dateTo);
+    const maxDateFrom = dayjs(this._state.dateTo).subtract(1, 'minute').toDate();
+    this.#datepickerFrom.set('maxDate', maxDateFrom);
   };
 
   #setDatepicker() {
@@ -181,11 +192,27 @@ export default class EditablePoint extends AbstractStatefulView {
       'time_24hr':true
     };
 
+    const minDateTo = this._state.dateFrom ? dayjs(this._state.dateFrom).add(1, 'minute').toDate() : null;
+    const maxDateFrom = this._state.dateTo ? dayjs(this._state.dateTo).subtract(1, 'minute').toDate() : null;
+
+    const getMinDateTo = () => {
+      if (this._state.dateFrom) {
+        this.#datepickerTo.set('minDate', minDateTo);
+      }
+    };
+
+    const getMaxDateFrom = () => {
+      if (this._state.dateTo) {
+        this.#datepickerFrom.set('maxDate', maxDateFrom);
+      }
+    };
+
     if (this.#isNewEvent) {
       this.#datepickerFrom = flatpickr(
         dateFromElement,
         {
           ...commonConfig,
+          defaultDate: this._state.dateFrom ,
           onClose: this.#dateFromCloseHandler,
         }
       );
@@ -194,9 +221,13 @@ export default class EditablePoint extends AbstractStatefulView {
         dateToElement,
         {
           ...commonConfig,
+          defaultDate: this._state.dateTo,
           onClose: this.#dateToCloseHandler,
         }
       );
+
+      getMinDateTo();
+      getMaxDateFrom();
       return;
     }
 
@@ -206,7 +237,6 @@ export default class EditablePoint extends AbstractStatefulView {
         ...commonConfig,
         defaultDate: this._state.dateFrom ,
         onClose: this.#dateFromCloseHandler,
-        maxDate: this._state.dateTo
       }
     );
 
@@ -216,17 +246,29 @@ export default class EditablePoint extends AbstractStatefulView {
         ...commonConfig,
         defaultDate: this._state.dateTo,
         onClose: this.#dateToCloseHandler,
-        minDate: this._state.dateFrom
       }
     );
+
+    getMinDateTo();
+    getMaxDateFrom();
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._state.basePrice = this.#getBasePrice();
+
+    if (!this._state.dateFrom || !this._state.dateTo) {
+      return;
+    }
+
+    if (this.#isNewEvent) {
+      this._setState({
+        ...this._state,
+        id: nanoid(),
+      });
+    }
+
     this.#isNewEvent = false;
     this.#handleFormSubmit(EditablePoint.parseStateToEvent(this._state));
-    this._state = null;
   };
 
   #closeButtonHandler = (evt) => {
@@ -242,23 +284,43 @@ export default class EditablePoint extends AbstractStatefulView {
     });
   };
 
-  #getBasePrice = () => this.element.querySelector('.event__input--price').value;
+  #offerChangeHandler = (evt) => {
+    const offerId = evt.target.dataset.id;
+    const isChecked = evt.target.checked;
+
+    this._setState({...this._state,
+      offers: isChecked ? [...this._state.offers, offerId] : this._state.offers.filter((offer) => offer !== offerId)
+    });
+  };
+
+  #priceChangeHandler = (evt) => {
+    this._setState({...this._state,
+      basePrice: Number(evt.target.value),
+    });
+  };
 
   #destinationChangeHandler = (evt) => {
     this.updateElement({
-      currentDestination: evt.target.value ? this.#destinations.getDestinationByName(evt.target.value) : '',
+      currentDestination: this.#destinations.getCurrentDestination(evt.target.value).currentDestination,
+      destination: this.#destinations.getCurrentDestination(evt.target.value).id,
     });
   };
 
   _restoreHandlers() {
+    this.#setDatepicker();
     this.element.addEventListener('submit', this.#formSubmitHandler);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#eventTypeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
+
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
     if (!this.#isNewEvent) {
       this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeButtonHandler);
     }
-    this.#setDatepicker();
+    if(this._state.offersByType.offers.length !== 0) {
+      this.element.querySelectorAll('.event__offer-checkbox')
+        .forEach((checkbox) => checkbox.addEventListener('change', this.#offerChangeHandler));
+    }
   }
 
   reset = () => {
@@ -288,7 +350,6 @@ export default class EditablePoint extends AbstractStatefulView {
 
   static parseStateToEvent(state) {
     return{...state,
-      destination: state.currentDestination.id,
       duration: calculateDuration(state.dateFrom, state.dateTo)
     };
   }

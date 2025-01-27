@@ -1,9 +1,9 @@
 import TripSort from '../view/trip-sort-view.js';
 import EventList from '../view/trip-events/list-view.js';
-// import EventItem from '../view/trip-events/item-view.js';
 import { render, remove } from '../framework/render.js';
 import { UpdateType, UserAction } from '../const.js';
 import ListEmptyMessageView from '../view/trip-events/list-empty-view.js';
+import LoadingView from '../view/loading-view.js';
 import EventPresenter from './event-presenter.js';
 import NewEventPresenter from './new-event-presenter.js';
 import { SortType, FilterType } from '../const.js';
@@ -18,7 +18,7 @@ export default class TripEventsPresenter {
   #destinationsModel = null;
   #offersModel = null;
   #eventListComponent = new EventList();
-  #eventItem = null;
+  #loadingComponent = new LoadingView();
   #eventsData = [];
   #presentersPoints = new Map();
   #currentSortType = SortType.DAY;
@@ -26,6 +26,7 @@ export default class TripEventsPresenter {
   #filterModel = null;
   #noEventComponent = null;
   #newEventPresenter = null;
+  #isLoading = true;
 
   constructor({container, eventsModel, destinationsModel, offersModel, filterModel, onNewEventDestroy}) {
     this.#container = container;
@@ -47,8 +48,8 @@ export default class TripEventsPresenter {
   }
 
   init() {
+    remove(this.#sortComponent);
     this.#eventsData = this.events;
-
     this.#renderEvents();
   }
 
@@ -71,10 +72,17 @@ export default class TripEventsPresenter {
 
   #renderEvents() {
     this.#eventsData = this.events;
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     if (this.#eventsData.length === 0) {
       this.#renderNoEvents();
       return;
     }
+
     this.#renderSort();
     render(this.#eventListComponent, this.#container);
     for (let i = 0; i < this.#eventsData.length; i++) {
@@ -88,6 +96,10 @@ export default class TripEventsPresenter {
       this.#presentersPoints.set(this.#eventsData[i].id, eventPresenter);
       eventPresenter.init(this.#eventsData[i]);
     }
+  }
+
+  #renderLoading() {
+    render(this.#loadingComponent, this.#container);
   }
 
   #renderNoEvents () {
@@ -115,7 +127,7 @@ export default class TripEventsPresenter {
     this.#presentersPoints.clear();
     remove(this.#sortComponent);
     remove(this.#eventListComponent);
-
+    remove(this.#loadingComponent);
     if (this.#noEventComponent) {
       remove(this.#noEventComponent);
     }
@@ -138,7 +150,6 @@ export default class TripEventsPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#presentersPoints.get(data.id).destroy();
         this.#presentersPoints.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
@@ -148,6 +159,11 @@ export default class TripEventsPresenter {
       case UpdateType.MAJOR:
         // - обновить всю доску (например, при переключении фильтра)
         this.#clearEvents();
+        this.#renderEvents();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderEvents();
         break;
     }

@@ -1,8 +1,13 @@
 import EventPoint from '../view/trip-events/event-point-view.js';
 import EditablePoint from '../view/trip-events/edit-event-point-view.js';
 import { render, replace, remove } from '../framework/render.js';
-import { isEscapeKey, getUpdateType } from '../utils/common.js';
+import { isEscapeKey, getUpdateType} from '../utils/common.js';
 import {UserAction, UpdateType} from '../const.js';
+
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
 
 export default class EventPresenter {
   #container = null;
@@ -13,7 +18,7 @@ export default class EventPresenter {
   #editablePointComponent = null;
   #handleDataChange = null;
   #onPointStateChange = null;
-  #isOpenEditForm = false;
+  #mode = Mode.DEFAULT;
 
   constructor({container, destinationsModel, offersModel,eventData, onDataChange, onPointStateChange}) {
     this.#container = container;
@@ -25,22 +30,19 @@ export default class EventPresenter {
   }
 
   init(eventData) {
-    const offersByType = this.#offersModel.getOffersByType(eventData.type);
-    //От pointInfo буду избавляться
-    const pointInfo = {
-      selectedOffers: this.#offersModel.getCurrentOffers(offersByType, eventData),
-      destination: this.#destinationsModel.getDestinationById(eventData.destination),
-    };
-
-    this.#renderEvent(eventData, pointInfo);
+    this.#eventData = eventData;
+    const offersByType = this.#offersModel.getOffersByType(this.#eventData.type);
+    this.#renderEvent(this.#eventData, offersByType);
   }
 
-  #renderEvent (event, info) {
+  #renderEvent (event, offersByType) {
+    const prevEventPointComponent = this.#eventPointComponent;
+    const prevEditablePointComponent = this.#editablePointComponent;
 
     this.#eventPointComponent = new EventPoint({
       event: event,
-      selectedOffers: info.selectedOffers,
-      cityName: info.destination.name,
+      selectedOffers: this.#offersModel.getCurrentOffers(offersByType, event),
+      cityName: this.#destinationsModel.getDestinationById(event.destination).name,
       onOpenButtonClick: this.#openButtonClickHandler,
       onFavoriteButtonClick: this.#toggleFavoriteStatus
     });
@@ -54,29 +56,39 @@ export default class EventPresenter {
       onDeleteClick: this.#handleDeleteClick
     });
 
-    if (this.#isOpenEditForm) {
-      render(this.#editablePointComponent, this.#container.element);
+    if (prevEventPointComponent === null || prevEditablePointComponent === null) {
+      render(this.#eventPointComponent, this.#container.element);
+      return;
     }
 
-    render(this.#eventPointComponent, this.#container.element);
+    if (this.#mode === Mode.DEFAULT) {
+      replace(this.#eventPointComponent, prevEventPointComponent);
+    }
+
+    if (this.#mode === Mode.EDITING) {
+      replace(this.#editablePointComponent, prevEditablePointComponent);
+    }
+
+    remove(prevEventPointComponent);
+    remove(prevEditablePointComponent);
   }
 
   #openEditForm () {
     this.#onPointStateChange();
-    this.#isOpenEditForm = true;
     replace(this.#editablePointComponent, this.#eventPointComponent);
+    this.#mode = Mode.EDITING;
   }
 
   #closeEditForm () {
     this.#editablePointComponent.reset();
-    this.#isOpenEditForm = false;
     replace(this.#eventPointComponent, this.#editablePointComponent);
+    this.#mode = Mode.DEFAULT;
   }
 
   #toggleFavoriteStatus = () => {
     this.#handleDataChange(
       UserAction.UPDATE_EVENT,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       {...this.#eventData, isFavorite: !this.#eventData.isFavorite},
     );
   };
@@ -109,7 +121,7 @@ export default class EventPresenter {
   };
 
   resetLastEditForm () {
-    if (this.#isOpenEditForm) {
+    if (this.#mode === Mode.EDITING) {
       this.#closeEditForm();
     }
   }

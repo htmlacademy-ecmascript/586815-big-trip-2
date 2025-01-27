@@ -1,19 +1,44 @@
-import {randomPoints} from '../mock/mocks.js';
 import Observable from '../framework/observable.js';
 import { calculateDuration } from '../utils/common.js';
-
-const EVENT_COUNT = 3;
+import { UpdateType } from '../const.js';
 
 export default class eventsModel extends Observable {
   #events = [];
+  #mainApiService = null;
 
-  constructor () {
+  constructor({mainApiService}) {
     super();
-    this.#events = this.#addDurationToEvents(randomPoints.splice(0, EVENT_COUNT));
+    this.#mainApiService = mainApiService;
+  }
+
+  init(points) {
+    this.#events = this.#addDurationToEvents(points.map(this.#adaptToClient));
+
+    this._notify(UpdateType.INIT);
   }
 
   get events() {
-    return this.#events;
+    return this.#addDurationToEvents(this.#events);
+  }
+
+  #adaptToClient(point) {
+    const adaptedPoint = {...point,
+      basePrice: point['base_price'],
+      dateFrom: point['date_from'] !== null ? new Date(point['date_from']) : point['date_from'] ,
+      dateTo: point['date_to'] !== null ? new Date(point['date_to']) : point['date_to'],
+      isFavorite: point['is_favorite'],
+    };
+
+    const adaptedEvent = {
+      ...adaptedPoint,
+      duration: calculateDuration(adaptedPoint.dateFrom, adaptedPoint.dateTo),
+    };
+
+    delete adaptedPoint['base_price'];
+    delete adaptedPoint['date_from'];
+    delete adaptedPoint['date_to'];
+    delete adaptedPoint['is_favorite'];
+    return adaptedEvent;
   }
 
   #addDurationToEvents(events) {
@@ -23,18 +48,27 @@ export default class eventsModel extends Observable {
     }));
   }
 
-  updateEvent(updateType, update) {
+  async updateEvent(updateType, update) {
     const index = this.#events.findIndex((event) => event.id === update.id);
+
     if (index === -1) {
       throw new Error('Can\'t update unexisting event');
     }
-    this.#events = [
-      ...this.#events.slice(0, index),
-      update,
-      ...this.#events.slice(index + 1),
-    ];
 
-    this._notify(updateType, update);
+    try {
+      const response = await this.#mainApiService.updatePoint(update);
+      const updatedEvent = this.#adaptToClient(response);
+
+      this.#events = [
+        ...this.#events.slice(0, index),
+        updatedEvent,
+        ...this.#events.slice(index + 1),
+      ];
+
+      this._notify(updateType, updatedEvent);
+    } catch(err) {
+      throw new Error('Can\'t update event');
+    }
   }
 
   addEvent(updateType, update) {

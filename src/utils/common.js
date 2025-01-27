@@ -20,6 +20,8 @@ const calculateDuration = (dateFrom, dateTo) => {
     return `${days.toString().padStart(DAYJS_FORMAT, '0')}D ${hours.toString().padStart(DAYJS_FORMAT, '0')}H ${minutes.toString().padStart(DAYJS_FORMAT, '0')}M`;
   } else if (hours > 0) {
     return `${hours.toString().padStart(DAYJS_FORMAT, '0')}H ${minutes.toString().padStart(DAYJS_FORMAT, '0')}M`;
+  } else if (minutes === 0 && diff.seconds() > 0) {
+    return '01M';
   } else {
     return `${minutes.toString().padStart(DAYJS_FORMAT, '0')}M`;
   }
@@ -31,7 +33,8 @@ const humanizeTaskDateTime = (dueDate) =>
     dateFull: dayjs(dueDate).format('YYYY-MM-DD'),
     date: dayjs(dueDate).format('MMM D'),
     time: dayjs(dueDate).format('HH:mm'),
-    editableDate: dayjs(dueDate).format('DD/MM/YY HH:mm')
+    editableDate: dayjs(dueDate).format('DD/MM/YY HH:mm'),
+    dateMainInfo: dayjs(dueDate).format('D MMM'),
   } : '';
 
 function getRandomArrayElement(items) {

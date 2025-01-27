@@ -1,14 +1,7 @@
-import { destinations } from '../mock/mocks.js';
-
-
 export default class DestinationsModel {
   #destinations = [];
 
-  constructor () {
-    this.#destinations = [];
-  }
-
-  init () {
+  init (destinations) {
     this.#destinations = destinations;
   }
 
@@ -26,5 +19,25 @@ export default class DestinationsModel {
 
   get destinationsNames () {
     return [...this.#destinations.map((obj) => obj.name)];
+  }
+
+  #isCorrectDestination(value) {
+    const foundDestination = this.#destinations.find(({ name }) => name === value);
+    return foundDestination !== undefined;
+  }
+
+  getCurrentDestination(value) {
+    if (this.#isCorrectDestination(value)){
+      const destination = this.getDestinationByName(value);
+      return {
+        currentDestination: destination,
+        id: destination.id,
+      };
+    }
+
+    return {
+      currentDestination: '',
+      id: '',
+    };
   }
 }
