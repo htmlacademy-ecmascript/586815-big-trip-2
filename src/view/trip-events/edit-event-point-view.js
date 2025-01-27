@@ -5,6 +5,7 @@ import flatpickr from 'flatpickr';
 import { calculateDuration } from '../../utils/common.js';
 import he from 'he';
 import { nanoid } from 'nanoid';
+import dayjs from 'dayjs';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -171,12 +172,14 @@ export default class EditablePoint extends AbstractStatefulView {
 
   #dateFromCloseHandler = ([userDate]) => {
     this._setState({...this._state, dateFrom: userDate});
-    this.#datepickerTo.set('minDate', this._state.dateFrom);
+    const minDateTo = dayjs(this._state.dateFrom).add(1, 'minute').toDate();
+    this.#datepickerTo.set('minDate', minDateTo);
   };
 
   #dateToCloseHandler = ([userDate]) => {
     this._setState({...this._state, dateTo: userDate});
-    this.#datepickerFrom.set('maxDate', this._state.dateTo);
+    const maxDateFrom = dayjs(this._state.dateTo).subtract(1, 'minute').toDate();
+    this.#datepickerFrom.set('maxDate', maxDateFrom);
   };
 
   #setDatepicker() {
@@ -187,6 +190,21 @@ export default class EditablePoint extends AbstractStatefulView {
       enableTime: true,
       locale: {firstDayOfWeek: 1},
       'time_24hr':true
+    };
+
+    const minDateTo = this._state.dateFrom ? dayjs(this._state.dateFrom).add(1, 'minute').toDate() : null;
+    const maxDateFrom = this._state.dateTo ? dayjs(this._state.dateTo).subtract(1, 'minute').toDate() : null;
+
+    const getMinDateTo = () => {
+      if (this._state.dateFrom) {
+        this.#datepickerTo.set('minDate', minDateTo);
+      }
+    };
+
+    const getMaxDateFrom = () => {
+      if (this._state.dateTo) {
+        this.#datepickerFrom.set('maxDate', maxDateFrom);
+      }
     };
 
     if (this.#isNewEvent) {
@@ -207,6 +225,9 @@ export default class EditablePoint extends AbstractStatefulView {
           onClose: this.#dateToCloseHandler,
         }
       );
+
+      getMinDateTo();
+      getMaxDateFrom();
       return;
     }
 
@@ -216,7 +237,6 @@ export default class EditablePoint extends AbstractStatefulView {
         ...commonConfig,
         defaultDate: this._state.dateFrom ,
         onClose: this.#dateFromCloseHandler,
-        maxDate: this._state.dateTo
       }
     );
 
@@ -226,9 +246,11 @@ export default class EditablePoint extends AbstractStatefulView {
         ...commonConfig,
         defaultDate: this._state.dateTo,
         onClose: this.#dateToCloseHandler,
-        minDate: this._state.dateFrom
       }
     );
+
+    getMinDateTo();
+    getMaxDateFrom();
   }
 
   #formSubmitHandler = (evt) => {
