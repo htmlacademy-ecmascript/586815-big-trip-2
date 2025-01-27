@@ -20,6 +20,8 @@ const calculateDuration = (dateFrom, dateTo) => {
     return `${days.toString().padStart(DAYJS_FORMAT, '0')}D ${hours.toString().padStart(DAYJS_FORMAT, '0')}H ${minutes.toString().padStart(DAYJS_FORMAT, '0')}M`;
   } else if (hours > 0) {
     return `${hours.toString().padStart(DAYJS_FORMAT, '0')}H ${minutes.toString().padStart(DAYJS_FORMAT, '0')}M`;
+  } else if (minutes === 0 && diff.seconds() > 0) {
+    return '01M';
   } else {
     return `${minutes.toString().padStart(DAYJS_FORMAT, '0')}M`;
   }
