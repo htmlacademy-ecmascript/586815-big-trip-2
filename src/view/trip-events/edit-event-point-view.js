@@ -4,7 +4,6 @@ import { TYPES_POINT } from '../../const.js';
 import flatpickr from 'flatpickr';
 import { calculateDuration } from '../../utils/common.js';
 import he from 'he';
-// import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
 
 import 'flatpickr/dist/flatpickr.min.css';
