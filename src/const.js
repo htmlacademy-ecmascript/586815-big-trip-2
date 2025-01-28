@@ -35,7 +35,6 @@ const UpdateType = {
 };
 
 const newEventPointData = {
-  id: '',
   type: 'flight',
   destination: '',
   dateFrom: '',
