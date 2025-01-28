@@ -24,17 +24,6 @@ const offersModel = new OffersModel();
 const filterModel = new FilterModel();
 new TripInfoPresenter({container: tripHeaderContainer, eventsModel, offersModel, destinationsModel});
 
-MainApiService.fetchAllData(mainApiServiceComponent).then((response) => {
-  const { points, destinations, offers} = response;
-  destinationsModel.init(destinations);
-  offersModel.init(offers);
-  eventsModel.init(points);
-}).catch((error) => {
-  console.error('Error fetching data:', error);// eslint-disable-line no-console
-}).finally(() => {
-  newEventButtonComponent.disabled = false;
-});
-
 const tripEventsPresenter = new TripEventsPresenter({
   container: tripEventsContainer,
   eventsModel: eventsModel,
@@ -42,6 +31,18 @@ const tripEventsPresenter = new TripEventsPresenter({
   offersModel,
   filterModel,
   onNewEventDestroy: handleNewEventFormClose
+});
+
+MainApiService.fetchAllData(mainApiServiceComponent).then((response) => {
+  const { points, destinations, offers} = response;
+  destinationsModel.init(destinations);
+  offersModel.init(offers);
+  eventsModel.init(points);
+}).catch(() => {
+  newEventButtonComponent.disabled = true;
+  tripEventsPresenter.renderError();
+}).finally(() => {
+  newEventButtonComponent.disabled = false;
 });
 
 const tripFiltersPresenter = new TripFiltersPresenter({container: tripFiltersContainer, filterModel, eventsModel});

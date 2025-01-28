@@ -109,6 +109,11 @@ export default class TripEventsPresenter {
     render(this.#noEventComponent, this.#container);
   }
 
+  renderError () {
+    this.#clearEvents();
+    render(new ListEmptyMessageView({filterType: null }) ,this.#container);
+  }
+
   createEvent() {
     this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
