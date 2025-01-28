@@ -141,12 +141,16 @@ export default class TripEventsPresenter {
   #handleViewAction = (actionType, updateType, update) => {
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
+        this.#presentersPoints.get(update.id).setSaving();
         this.#eventsModel.updateEvent(updateType, update);
         break;
       case UserAction.ADD_EVENT:
+        this.#newEventPresenter.setSaving();
         this.#eventsModel.addEvent(updateType, update);
+        this.#newEventPresenter.destroy();
         break;
       case UserAction.DELETE_EVENT:
+        this.#presentersPoints.get(update.id).setDeleting();
         this.#eventsModel.deleteEvent(updateType, update);
         break;
     }

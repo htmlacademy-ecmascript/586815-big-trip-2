@@ -66,11 +66,31 @@ export default class EventPresenter {
     }
 
     if (this.#mode === Mode.EDITING) {
-      replace(this.#editablePointComponent, prevEditablePointComponent);
+      // replace(this.#editablePointComponent, prevEditablePointComponent);
+      replace(this.#eventPointComponent, prevEditablePointComponent);
+      this.#mode = Mode.DEFAULT;
     }
 
     remove(prevEventPointComponent);
     remove(prevEditablePointComponent);
+  }
+
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editablePointComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editablePointComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
   }
 
   #openEditForm () {
@@ -112,7 +132,7 @@ export default class EventPresenter {
       getUpdateType(updatedEvent, this.#eventData) ? UpdateType.MINOR : UpdateType.PATCH,
       updatedEvent,
     );
-    this.#closeEditForm();
+    // this.#closeEditForm();
   };
 
   #closeButtonClickHandler = () => {
