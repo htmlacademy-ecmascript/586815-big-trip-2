@@ -66,11 +66,30 @@ export default class EventPresenter {
     }
 
     if (this.#mode === Mode.EDITING) {
-      replace(this.#editablePointComponent, prevEditablePointComponent);
+      replace(this.#eventPointComponent, prevEditablePointComponent);
+      this.#mode = Mode.DEFAULT;
     }
 
     remove(prevEventPointComponent);
     remove(prevEditablePointComponent);
+  }
+
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editablePointComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editablePointComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
   }
 
   #openEditForm () {
@@ -101,6 +120,23 @@ export default class EventPresenter {
     }
   };
 
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#eventPointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#editablePointComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#editablePointComponent.shake(resetFormState);
+  }
+
   #openButtonClickHandler = () => {
     this.#openEditForm();
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -112,7 +148,6 @@ export default class EventPresenter {
       getUpdateType(updatedEvent, this.#eventData) ? UpdateType.MINOR : UpdateType.PATCH,
       updatedEvent,
     );
-    this.#closeEditForm();
   };
 
   #closeButtonClickHandler = () => {

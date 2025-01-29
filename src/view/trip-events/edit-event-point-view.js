@@ -4,13 +4,14 @@ import { TYPES_POINT } from '../../const.js';
 import flatpickr from 'flatpickr';
 import { calculateDuration } from '../../utils/common.js';
 import he from 'he';
-import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
 function createEditableEventTemplate(state, isNewEvent) {
-  const { type, destination ,dateFrom, dateTo, basePrice, offers, currentDestination, destinationsNames, offersByType } = state;
+  const { type, destination ,dateFrom, dateTo, basePrice, offers, currentDestination, destinationsNames, offersByType, isDisabled,
+    isSaving,
+    isDeleting, } = state;
 
   const departure = humanizeTaskDateTime(dateFrom);
   const arrival = humanizeTaskDateTime(dateTo);
@@ -20,6 +21,8 @@ function createEditableEventTemplate(state, isNewEvent) {
     }
     return '';
   };
+
+  const getTextDeleteButton = () => isNewEvent ? 'Cancel' : 'Delete';
 
   const getDestinationInfo = () => {
     if (currentDestination && currentDestination.description && currentDestination.pictures) {
@@ -51,7 +54,7 @@ function createEditableEventTemplate(state, isNewEvent) {
     `<div class="event__offer-selector">
                         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-${offer.id}" type="checkbox" name="event-offer-${offer.title}"
                         data-id="${offer.id}"
-                        ${getStatusOffer(offer.id)}>
+                        ${getStatusOffer(offer.id)} ${isDisabled ? 'disabled' : ''}>
                         <label class="event__offer-label" for="event-offer-${offer.title}-${offer.id}">
                           <span class="event__offer-title">${offer.title}</span>
                           &plus;&euro;&nbsp;
@@ -83,7 +86,7 @@ function createEditableEventTemplate(state, isNewEvent) {
                         <legend class="visually-hidden">Event type</legend>
 ${TYPES_POINT.map((item) =>`
                         <div class="event__type-item">
-                          <input id="event-type-${item.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${item.toLowerCase()}" ${getStatusType(item)}>
+                          <input id="event-type-${item.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${item.toLowerCase()}" ${getStatusType(item)} ${ isDisabled ? 'disabled' : '' }>
                           <label class="event__type-label  event__type-label--${item.toLowerCase()}" for="event-type-${item.toLowerCase()}-1">${item}</label>
                         </div>`
   ).join('')}
@@ -95,7 +98,7 @@ ${TYPES_POINT.map((item) =>`
                     <label class="event__label  event__type-output" for="event-destination-${destination}">
                     ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-${destination}" type="text" name="event-destination" value="${currentDestination ? currentDestination.name : ''}" list="destination-list-1" required>
+                    <input class="event__input  event__input--destination" id="event-destination-${destination}" type="text" name="event-destination" value="${currentDestination ? currentDestination.name : ''}" list="destination-list-1" required ${ isDisabled ? 'disabled' : '' }>
                     <datalist id="destination-list-1">
                     ${destinationsNames.map((city) =>`<option value="${he.encode(city)}"></option>`).join('')}
                     </datalist>
@@ -103,10 +106,10 @@ ${TYPES_POINT.map((item) =>`
 
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${!isNewEvent ? departure.editableDate : ''}" required>
+                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${!isNewEvent ? departure.editableDate : ''}" required ${ isDisabled ? 'disabled' : '' }>
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-1">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${!isNewEvent ? arrival.editableDate : ''}" required>
+                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${!isNewEvent ? arrival.editableDate : ''}" required ${ isDisabled ? 'disabled' : '' }>
                   </div>
 
                   <div class="event__field-group  event__field-group--price">
@@ -114,11 +117,11 @@ ${TYPES_POINT.map((item) =>`
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" min="1" step="1" value="${basePrice}">
+                    <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" min="1" step="1" value="${basePrice}" ${ isDisabled ? 'disabled' : '' }>
                   </div>
 
-                  <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                  <button class="event__reset-btn" type="reset">${isNewEvent ? 'Cancel' : 'Delete'}</button>
+                  <button class="event__save-btn  btn  btn--blue" type="submit" ${ isDisabled ? 'disabled' : '' }>${isSaving ? 'Saving...' : 'Save'}</button>
+                  <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}> ${isDeleting ? 'Deleting...' : getTextDeleteButton()}</button>
                   ${isNewEvent ? '' : `<button class="event__rollup-btn" type="button">
                     <span class="visually-hidden">Open event</span>
                   </button>`}
@@ -261,10 +264,7 @@ export default class EditablePoint extends AbstractStatefulView {
     }
 
     if (this.#isNewEvent) {
-      this._setState({
-        ...this._state,
-        id: nanoid(),
-      });
+      this._setState(this._state);
     }
 
     this.#isNewEvent = false;
@@ -344,7 +344,10 @@ export default class EditablePoint extends AbstractStatefulView {
       offersByType: offersByType,
       selectedOffers: offers.getCurrentOffers(offersByType, event),
       currentDestination: destinations.getDestinationById(event.destination),
-      destinationsNames: destinations.destinationsNames
+      destinationsNames: destinations.destinationsNames,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
     };
   }
 

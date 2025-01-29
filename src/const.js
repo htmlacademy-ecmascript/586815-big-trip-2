@@ -11,7 +11,8 @@ const MessageListEmpty = {
   [FilterType.EVERYTHING]: 'Click New Event to create your first point',
   [FilterType.PAST]: 'There are no past events now',
   [FilterType.PRESENT]: 'There are no present events now',
-  [FilterType.FUTURE]: 'There are no future events now'
+  [FilterType.FUTURE]: 'There are no future events now',
+  messageError: 'Failed to load latest route information'
 };
 
 const SortType = {
@@ -34,7 +35,6 @@ const UpdateType = {
 };
 
 const newEventPointData = {
-  id: '',
   type: 'flight',
   destination: '',
   dateFrom: '',

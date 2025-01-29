@@ -3,7 +3,7 @@ import { MessageListEmpty } from '../../const.js';
 
 function createListEmptyMessageTemplate (filterType) {
   return `
-<p class="trip-events__msg">${MessageListEmpty[filterType]}</p>
+<p class="trip-events__msg">${filterType !== null ? MessageListEmpty[filterType] : MessageListEmpty.messageError}</p>
 `;
 }
 
