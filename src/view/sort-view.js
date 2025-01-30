@@ -33,7 +33,7 @@ function createSortTemplate(currentSortType) {
   `;
 }
 
-export default class TripSort extends AbstractView {
+export default class SortView extends AbstractView {
   #handleSortTypeChange = null;
   #currentSortType = null;
 

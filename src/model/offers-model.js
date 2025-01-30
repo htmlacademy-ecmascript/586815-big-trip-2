@@ -13,7 +13,7 @@ export default class OffersModel {
     return this.#offers.find(({type}) => type === eventType);
   }
 
-  getCurrentOffers (offersByType, point) {
-    return offersByType.offers.filter((offer) => point.offers.includes(offer.id));
+  getCurrentOffers (offersByType, event) {
+    return offersByType.offers.filter((offer) => event.offers.includes(offer.id));
   }
 }

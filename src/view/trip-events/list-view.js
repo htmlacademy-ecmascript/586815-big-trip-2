@@ -6,7 +6,7 @@ function createListTemplate() {
   `;
 }
 
-export default class EventList extends AbstractView {
+export default class ListView extends AbstractView {
   get template() {
     return createListTemplate();
   }

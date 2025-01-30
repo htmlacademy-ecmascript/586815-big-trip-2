@@ -8,7 +8,7 @@ const Method = {
 };
 
 export default class MainApiService extends ApiService {
-  get points() {
+  get events() {
     return this._load({url: 'points'})
       .then(ApiService.parseResponse);
   }
@@ -71,11 +71,11 @@ export default class MainApiService extends ApiService {
 
   static fetchAllData(apiServiceInstance) {
     return Promise.all([
-      apiServiceInstance.points,
+      apiServiceInstance.events,
       apiServiceInstance.destinations,
       apiServiceInstance.offers
-    ]).then(([points, destinations, offers]) => ({
-      points,
+    ]).then(([events, destinations, offers]) => ({
+      events,
       destinations,
       offers
     }));

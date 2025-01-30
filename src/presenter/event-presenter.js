@@ -1,5 +1,5 @@
-import EventPoint from '../view/trip-events/event-point-view.js';
-import EditablePoint from '../view/trip-events/edit-event-point-view.js';
+import EventView from '../view/trip-events/event-view.js';
+import EditEventView from '../view/trip-events/edit-event-view.js';
 import { render, replace, remove } from '../framework/render.js';
 import { isEscapeKey, getUpdateType} from '../utils/common.js';
 import {UserAction, UpdateType} from '../const.js';
@@ -14,19 +14,19 @@ export default class EventPresenter {
   #offersModel = [];
   #destinationsModel = [];
   #eventData = {};
-  #eventPointComponent = null;
-  #editablePointComponent = null;
+  #eventComponent = null;
+  #editEventComponent = null;
   #handleDataChange = null;
-  #onPointStateChange = null;
+  #onEventStateChange = null;
   #mode = Mode.DEFAULT;
 
-  constructor({container, destinationsModel, offersModel,eventData, onDataChange, onPointStateChange}) {
+  constructor({container, destinationsModel, offersModel,eventData, onDataChange, onEventStateChange}) {
     this.#container = container;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#eventData = eventData;
     this.#handleDataChange = onDataChange;
-    this.#onPointStateChange = onPointStateChange;
+    this.#onEventStateChange = onEventStateChange;
   }
 
   init(eventData) {
@@ -36,10 +36,10 @@ export default class EventPresenter {
   }
 
   #renderEvent (event, offersByType) {
-    const prevEventPointComponent = this.#eventPointComponent;
-    const prevEditablePointComponent = this.#editablePointComponent;
+    const prevEventComponent = this.#eventComponent;
+    const prevEditEventComponent = this.#editEventComponent;
 
-    this.#eventPointComponent = new EventPoint({
+    this.#eventComponent = new EventView({
       event: event,
       selectedOffers: this.#offersModel.getCurrentOffers(offersByType, event),
       cityName: this.#destinationsModel.getDestinationById(event.destination).name,
@@ -47,7 +47,7 @@ export default class EventPresenter {
       onFavoriteButtonClick: this.#toggleFavoriteStatus
     });
 
-    this.#editablePointComponent = new EditablePoint({
+    this.#editEventComponent = new EditEventView({
       event: event,
       allOffers: this.#offersModel,
       allDestinations: this.#destinationsModel,
@@ -56,27 +56,27 @@ export default class EventPresenter {
       onDeleteClick: this.#handleDeleteClick
     });
 
-    if (prevEventPointComponent === null || prevEditablePointComponent === null) {
-      render(this.#eventPointComponent, this.#container.element);
+    if (prevEventComponent === null || prevEditEventComponent === null) {
+      render(this.#eventComponent, this.#container.element);
       return;
     }
 
     if (this.#mode === Mode.DEFAULT) {
-      replace(this.#eventPointComponent, prevEventPointComponent);
+      replace(this.#eventComponent, prevEventComponent);
     }
 
     if (this.#mode === Mode.EDITING) {
-      replace(this.#eventPointComponent, prevEditablePointComponent);
+      replace(this.#eventComponent, prevEditEventComponent);
       this.#mode = Mode.DEFAULT;
     }
 
-    remove(prevEventPointComponent);
-    remove(prevEditablePointComponent);
+    remove(prevEventComponent);
+    remove(prevEditEventComponent);
   }
 
   setSaving() {
     if (this.#mode === Mode.EDITING) {
-      this.#editablePointComponent.updateElement({
+      this.#editEventComponent.updateElement({
         isDisabled: true,
         isSaving: true,
       });
@@ -85,7 +85,7 @@ export default class EventPresenter {
 
   setDeleting() {
     if (this.#mode === Mode.EDITING) {
-      this.#editablePointComponent.updateElement({
+      this.#editEventComponent.updateElement({
         isDisabled: true,
         isDeleting: true,
       });
@@ -93,14 +93,14 @@ export default class EventPresenter {
   }
 
   #openEditForm () {
-    this.#onPointStateChange();
-    replace(this.#editablePointComponent, this.#eventPointComponent);
+    this.#onEventStateChange();
+    replace(this.#editEventComponent, this.#eventComponent);
     this.#mode = Mode.EDITING;
   }
 
   #closeEditForm () {
-    this.#editablePointComponent.reset();
-    replace(this.#eventPointComponent, this.#editablePointComponent);
+    this.#editEventComponent.reset();
+    replace(this.#eventComponent, this.#editEventComponent);
     this.#mode = Mode.DEFAULT;
   }
 
@@ -114,19 +114,19 @@ export default class EventPresenter {
 
   setAborting() {
     if (this.#mode === Mode.DEFAULT) {
-      this.#eventPointComponent.shake();
+      this.#eventComponent.shake();
       return;
     }
 
     const resetFormState = () => {
-      this.#editablePointComponent.updateElement({
+      this.#editEventComponent.updateElement({
         isDisabled: false,
         isSaving: false,
         isDeleting: false,
       });
     };
 
-    this.#editablePointComponent.shake(resetFormState);
+    this.#editEventComponent.shake(resetFormState);
   }
 
   #openButtonClickHandler = () => {
@@ -141,8 +141,8 @@ export default class EventPresenter {
   }
 
   destroy() {
-    remove(this.#eventPointComponent);
-    remove(this.#editablePointComponent);
+    remove(this.#eventComponent);
+    remove(this.#editEventComponent);
   }
 
   #formSubmitHandler = (updatedEvent) => {

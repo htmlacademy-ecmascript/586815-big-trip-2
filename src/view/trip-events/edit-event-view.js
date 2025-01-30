@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
-import { humanizeTaskDateTime } from '../../utils/common.js';
-import { TYPES_POINT } from '../../const.js';
+import { humanizeDateTime } from '../../utils/common.js';
+import { TYPES_EVENT } from '../../const.js';
 import flatpickr from 'flatpickr';
 import { calculateDuration } from '../../utils/common.js';
 import he from 'he';
@@ -8,13 +8,13 @@ import dayjs from 'dayjs';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
-function createEditableEventTemplate(state, isNewEvent) {
+function createEditEventTemplate(state, isNewEvent) {
   const { type, destination ,dateFrom, dateTo, basePrice, offers, currentDestination, destinationsNames, offersByType, isDisabled,
     isSaving,
     isDeleting, } = state;
 
-  const departure = humanizeTaskDateTime(dateFrom);
-  const arrival = humanizeTaskDateTime(dateTo);
+  const departure = humanizeDateTime(dateFrom);
+  const arrival = humanizeDateTime(dateTo);
   const getStatusOffer = (id) => {
     if (offers.length !== 0) {
       return offers.includes(id) ? 'checked' : '';
@@ -84,7 +84,7 @@ function createEditableEventTemplate(state, isNewEvent) {
                     <div class="event__type-list">
                       <fieldset class="event__type-group">
                         <legend class="visually-hidden">Event type</legend>
-${TYPES_POINT.map((item) =>`
+${TYPES_EVENT.map((item) =>`
                         <div class="event__type-item">
                           <input id="event-type-${item.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${item.toLowerCase()}" ${getStatusType(item)} ${ isDisabled ? 'disabled' : '' }>
                           <label class="event__type-label  event__type-label--${item.toLowerCase()}" for="event-type-${item.toLowerCase()}-1">${item}</label>
@@ -135,7 +135,7 @@ ${TYPES_POINT.map((item) =>`
   `;
 }
 
-export default class EditablePoint extends AbstractStatefulView {
+export default class EditEventView extends AbstractStatefulView {
   #event = {};
   #offers = [];
   #destinations = [];
@@ -155,12 +155,12 @@ export default class EditablePoint extends AbstractStatefulView {
     this.#handleCloseButtonClick = onCloseButtonClick;
     this.#handleDeleteClick = onDeleteClick;
     this. #isNewEvent = isNewEvent;
-    this._setState(EditablePoint.parseEventToState(this.#event, this.#offers, this.#destinations));
+    this._setState(EditEventView.parseEventToState(this.#event, this.#offers, this.#destinations));
     this._restoreHandlers();
   }
 
   get template() {
-    return createEditableEventTemplate(this._state, this.#isNewEvent);
+    return createEditEventTemplate(this._state, this.#isNewEvent);
   }
 
   removeElement() {
@@ -174,7 +174,7 @@ export default class EditablePoint extends AbstractStatefulView {
   }
 
   reset = () => {
-    this._setState(EditablePoint.parseEventToState(this.#event, this.#offers, this.#destinations));
+    this._setState(EditEventView.parseEventToState(this.#event, this.#offers, this.#destinations));
     this.updateElement(this._state);
   };
 
@@ -273,7 +273,7 @@ export default class EditablePoint extends AbstractStatefulView {
     }
 
     this.#isNewEvent = false;
-    this.#handleFormSubmit(EditablePoint.parseStateToEvent(this._state));
+    this.#handleFormSubmit(EditEventView.parseStateToEvent(this._state));
   };
 
   #closeButtonHandler = (evt) => {
@@ -334,7 +334,7 @@ export default class EditablePoint extends AbstractStatefulView {
       this.#handleDeleteClick();
       return;
     }
-    this.#handleDeleteClick(EditablePoint.parseStateToEvent(this._state));
+    this.#handleDeleteClick(EditEventView.parseStateToEvent(this._state));
   };
 
   static parseEventToState(event, offers, destinations) {

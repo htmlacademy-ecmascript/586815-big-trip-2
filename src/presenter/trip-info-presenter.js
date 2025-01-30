@@ -1,11 +1,11 @@
-import TripInfoMainContainer from '../view/trip-info/main-container-view.js';
-import TripInfoContainer from '../view/trip-info/container-view.js';
-import TripInfoTitle from '../view/trip-info/title-view.js';
-import TripInfoDates from '../view/trip-info/dates-view.js';
-import TripInfoCost from '../view/trip-info/cost-view.js';
+import MainContainerView from '../view/trip-info/main-container-view.js';
+import InfoContainerView from '../view/trip-info/info-container-view.js';
+import TitleView from '../view/trip-info/title-view.js';
+import DatesView from '../view/trip-info/dates-view.js';
+import CostView from '../view/trip-info/cost-view.js';
 import { RenderPosition, render, remove, replace } from '../framework/render.js';
 import { sortEventsByDay } from '../utils/sort.js';
-import { humanizeTaskDateTime } from '../utils/common.js';
+import { humanizeDateTime } from '../utils/common.js';
 import { isDatesChanged, isCitiesChanged, isCostChanged } from '../utils/main-info.js';
 
 const MAX_CITY_COUNT = 3;
@@ -35,8 +35,8 @@ export default class TripInfoPresenter {
   }
 
   init() {
-    this.#mainContainerComponent = new TripInfoMainContainer();
-    this.#containerComponent = new TripInfoContainer();
+    this.#mainContainerComponent = new MainContainerView();
+    this.#containerComponent = new InfoContainerView();
   }
 
   #destroy = () => {
@@ -86,8 +86,8 @@ export default class TripInfoPresenter {
       return;
     }
 
-    const { dateMainInfo: firstDay } = humanizeTaskDateTime(events[0].dateFrom);
-    const { dateMainInfo: lastDay } = humanizeTaskDateTime(events[events.length - 1].dateTo);
+    const { dateMainInfo: firstDay } = humanizeDateTime(events[0].dateFrom);
+    const { dateMainInfo: lastDay } = humanizeDateTime(events[events.length - 1].dateTo);
 
     const [firstDayDate, firstDayMonth] = firstDay.split(' ');
     const lastDayMonth = lastDay.split(' ')[1];
@@ -102,7 +102,7 @@ export default class TripInfoPresenter {
   #renderCost = () => {
     const cost = this.#cost;
     const prevCostComponent = this.#costComponent;
-    this.#costComponent = new TripInfoCost({
+    this.#costComponent = new CostView({
       cost
     });
 
@@ -119,7 +119,7 @@ export default class TripInfoPresenter {
     const destinations = this.#tripDestinations;
     const prevTripDestinationsComponent = this.#tripDestinationsComponent;
 
-    this.#tripDestinationsComponent = new TripInfoTitle({
+    this.#tripDestinationsComponent = new TitleView({
       destinations
     });
 
@@ -136,7 +136,7 @@ export default class TripInfoPresenter {
     const period = this.#tripPeriod;
     const prevPeriodComponent = this.#periodComponent;
 
-    this.#periodComponent = new TripInfoDates({
+    this.#periodComponent = new DatesView({
       period
     });
 

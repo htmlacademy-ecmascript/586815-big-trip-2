@@ -1,11 +1,11 @@
 import AbstractView from '../../framework/view/abstract-view.js';
-import { humanizeTaskDateTime } from '../../utils/common.js';
+import { humanizeDateTime } from '../../utils/common.js';
 
-function createEventPointTemplate(event, cityName, selectedOffers) {
+function createEventTemplate(event, cityName, selectedOffers) {
   const { basePrice, type, dateFrom, dateTo, isFavorite, duration} = event;
 
-  const departure = humanizeTaskDateTime(dateFrom);
-  const arrival = humanizeTaskDateTime(dateTo);
+  const departure = humanizeDateTime(dateFrom);
+  const arrival = humanizeDateTime(dateTo);
   const favoriteClassName = isFavorite
     ? 'event__favorite-btn event__favorite-btn--active'
     : 'event__favorite-btn';
@@ -52,7 +52,7 @@ function createEventPointTemplate(event, cityName, selectedOffers) {
   `;
 }
 
-export default class EventPoint extends AbstractView {
+export default class EventView extends AbstractView {
   #event = null;
   #handleOpenButtonClick = null;
   #handleFavoriteButtonClick = null;
@@ -70,7 +70,7 @@ export default class EventPoint extends AbstractView {
   }
 
   get template() {
-    return createEventPointTemplate(this.#event, this.cityName, this.selectedOffers);
+    return createEventTemplate(this.#event, this.cityName, this.selectedOffers);
   }
 
   #openButtonClickHandler = (evt) => {
