@@ -1,5 +1,5 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
-import EditablePoint from '../view/trip-events/edit-event-point-view.js';
+import EditEventView from '../view/trip-events/edit-event-view.js';
 import { UserAction, UpdateType } from '../const.js';
 import { isEscapeKey } from '../utils/common.js';
 
@@ -8,16 +8,16 @@ export default class NewEventPresenter {
   #handleDataChange = null;
   #handleDestroy = null;
   #eventEditComponent = null;
-  #newEventPointData = null;
+  #newEventData = null;
   #destinationsModel = null;
   #offersModel = null;
 
-  constructor({eventListContainer, onDataChange, onDestroy, newEventPointData,
+  constructor({eventListContainer, onDataChange, onDestroy, newEventData,
     destinationsModel, offersModel}) {
     this.#eventListContainer = eventListContainer;
     this.#handleDataChange = onDataChange;
     this.#handleDestroy = onDestroy;
-    this.#newEventPointData = newEventPointData;
+    this.#newEventData = newEventData;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
   }
@@ -27,8 +27,8 @@ export default class NewEventPresenter {
       return;
     }
 
-    this.#eventEditComponent = new EditablePoint({
-      event: this.#newEventPointData,
+    this.#eventEditComponent = new EditEventView({
+      event: this.#newEventData,
       allOffers: this.#offersModel,
       allDestinations: this.#destinationsModel,
       onFormSubmit: this.#handleFormSubmit,

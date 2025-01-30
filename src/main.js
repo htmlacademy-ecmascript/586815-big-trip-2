@@ -34,10 +34,10 @@ const tripEventsPresenter = new TripEventsPresenter({
 });
 
 MainApiService.fetchAllData(mainApiServiceComponent).then((response) => {
-  const { points, destinations, offers} = response;
+  const { events, destinations, offers} = response;
   destinationsModel.init(destinations);
   offersModel.init(offers);
-  eventsModel.init(points);
+  eventsModel.init(events);
 }).catch(() => {
   newEventButtonComponent.disabled = true;
   tripEventsPresenter.renderError();

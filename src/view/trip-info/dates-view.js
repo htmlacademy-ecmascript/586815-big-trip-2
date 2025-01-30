@@ -6,7 +6,7 @@ function createDatesTemplate(period) {
   `;
 }
 
-export default class TripInfoDates extends AbstractView {
+export default class DatesView extends AbstractView {
   #period = null;
 
   constructor({ period }) {

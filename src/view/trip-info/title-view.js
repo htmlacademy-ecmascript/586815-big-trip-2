@@ -6,7 +6,7 @@ function createTitleTemplate(destinations) {
   `;
 }
 
-export default class TripInfoTitle extends AbstractView {
+export default class TitleView extends AbstractView {
   #destinations = null;
 
   constructor({destinations}) {

@@ -1,4 +1,4 @@
-const TYPES_POINT = [ 'Taxi', 'Bus', 'Train', 'Ship', 'Drive', 'Flight', 'Check-in', 'Sightseeing', 'Restaurant'];
+const TYPES_EVENT = [ 'Taxi', 'Bus', 'Train', 'Ship', 'Drive', 'Flight', 'Check-in', 'Sightseeing', 'Restaurant'];
 
 const FilterType = {
   EVERYTHING: 'everything',
@@ -34,7 +34,7 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
-const newEventPointData = {
+const newEventData = {
   type: 'flight',
   destination: '',
   dateFrom: '',
@@ -44,4 +44,4 @@ const newEventPointData = {
   offers: []
 };
 
-export {TYPES_POINT, FilterType, MessageListEmpty, SortType, UserAction, UpdateType, newEventPointData };
+export {TYPES_EVENT, FilterType, MessageListEmpty, SortType, UserAction, UpdateType, newEventData };

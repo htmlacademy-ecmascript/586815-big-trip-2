@@ -2,7 +2,6 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import isBetween from 'dayjs/plugin/isBetween';
 
-const SORT_COUNT = 0.5;
 const DAYJS_FORMAT = 2;
 
 dayjs.extend(duration);
@@ -27,7 +26,7 @@ const calculateDuration = (dateFrom, dateTo) => {
   }
 };
 
-const humanizeTaskDateTime = (dueDate) =>
+const humanizeDateTime = (dueDate) =>
   dueDate ? {
     dateTimeFull: dayjs(dueDate).format('YYYY-MM-DDTHH-mm'),
     dateFull: dayjs(dueDate).format('YYYY-MM-DD'),
@@ -36,24 +35,6 @@ const humanizeTaskDateTime = (dueDate) =>
     editableDate: dayjs(dueDate).format('DD/MM/YY HH:mm'),
     dateMainInfo: dayjs(dueDate).format('D MMM'),
   } : '';
-
-function getRandomArrayElement(items) {
-  return items[Math.floor(Math.random() * items.length)];
-}
-
-function getRandomArray(items) {
-  return items.slice().sort(() => Math.random() - SORT_COUNT);
-}
-
-function getRandomSentences(sentences) {
-  const shuffledSentences = [...sentences].sort(() => Math.random() - SORT_COUNT);
-  const randomCount = Math.floor(Math.random() * 5) + 1;
-  return shuffledSentences.slice(0, randomCount).join(' ');
-}
-
-function getRandomInteger () {
-  return Math.random();
-}
 
 function isEventInFuture(dueDate) {
   return dueDate && dayjs().isBefore(dueDate, 'D');
@@ -67,14 +48,8 @@ function isCurrentDayInRange(startDate, endDate) {
   return dayjs().isBetween(startDate, endDate, 'day', '[]');
 }
 
-function updateItem(eventsData, updatedItem) {
-  return eventsData.map((item) =>
-    item.id === updatedItem.id ? {...item, ...updatedItem} : item
-  );
-}
-
 const isEscapeKey = (evt) => evt.key === 'Escape';
 
 const getUpdateType = (updatedEvent, currentEvent) => updatedEvent.dateFrom !== currentEvent.dateFrom || updatedEvent.basePrice !== currentEvent.basePrice || updatedEvent.duration !== currentEvent.duration;
 
-export {getRandomArrayElement, getRandomSentences, getRandomInteger, getRandomArray, humanizeTaskDateTime, calculateDuration, isEventInFuture, isCurrentDayInRange, isEventExpired, updateItem, getDurationInMs, isEscapeKey, getUpdateType};
+export {humanizeDateTime, calculateDuration, isEventInFuture, isCurrentDayInRange, isEventExpired, getDurationInMs, isEscapeKey, getUpdateType};

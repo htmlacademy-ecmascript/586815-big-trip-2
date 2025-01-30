@@ -8,7 +8,7 @@ function createCostTemplate(cost) {
   `;
 }
 
-export default class TripInfoCost extends AbstractView{
+export default class CostView extends AbstractView{
   #cost = 0;
 
   constructor({cost}) {

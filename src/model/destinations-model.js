@@ -1,12 +1,16 @@
 export default class DestinationsModel {
   #destinations = [];
 
-  init (destinations) {
-    this.#destinations = destinations;
-  }
-
   get destinations () {
     return this.#destinations;
+  }
+
+  get destinationsNames () {
+    return [...this.#destinations.map((obj) => obj.name)];
+  }
+
+  init (destinations) {
+    this.#destinations = destinations;
   }
 
   getDestinationById (eventDestinationId) {
@@ -15,10 +19,6 @@ export default class DestinationsModel {
 
   getDestinationByName (destinationName) {
     return this.#destinations.find(({name}) => name === destinationName);
-  }
-
-  get destinationsNames () {
-    return [...this.#destinations.map((obj) => obj.name)];
   }
 
   #isCorrectDestination(value) {

@@ -1,13 +1,13 @@
 import AbstractView from '../../framework/view/abstract-view.js';
 import { MessageListEmpty } from '../../const.js';
 
-function createListEmptyMessageTemplate (filterType) {
+function createListEmptyTemplate (filterType) {
   return `
 <p class="trip-events__msg">${filterType !== null ? MessageListEmpty[filterType] : MessageListEmpty.messageError}</p>
 `;
 }
 
-export default class ListEmptyMessageView extends AbstractView {
+export default class ListEmptyView extends AbstractView {
   #filterType = null;
 
   constructor({filterType}) {
@@ -16,6 +16,6 @@ export default class ListEmptyMessageView extends AbstractView {
   }
 
   get template() {
-    return createListEmptyMessageTemplate(this.#filterType);
+    return createListEmptyTemplate(this.#filterType);
   }
 }

@@ -6,7 +6,7 @@ function createMainContainerTemplate() {
   `;
 }
 
-export default class TripInfoMainContainer extends AbstractView {
+export default class MainContainerView extends AbstractView {
   get template() {
     return createMainContainerTemplate();
   }
