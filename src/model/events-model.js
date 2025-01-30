@@ -11,14 +11,14 @@ export default class eventsModel extends Observable {
     this.#mainApiService = mainApiService;
   }
 
+  get events() {
+    return this.#addDurationToEvents(this.#events);
+  }
+
   init(points) {
     this.#events = this.#addDurationToEvents(points.map(this.#adaptToClient));
 
     this._notify(UpdateType.INIT);
-  }
-
-  get events() {
-    return this.#addDurationToEvents(this.#events);
   }
 
   #adaptToClient(point) {

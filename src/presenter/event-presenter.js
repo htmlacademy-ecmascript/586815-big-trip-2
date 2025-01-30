@@ -112,14 +112,6 @@ export default class EventPresenter {
     );
   };
 
-  #escKeyDownHandler = (evt) => {
-    if (isEscapeKey(evt)) {
-      evt.preventDefault();
-      this.#closeEditForm();
-      document.removeEventListener('keydown', this.#escKeyDownHandler);
-    }
-  };
-
   setAborting() {
     if (this.#mode === Mode.DEFAULT) {
       this.#eventPointComponent.shake();
@@ -142,6 +134,17 @@ export default class EventPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
+  resetLastEditForm () {
+    if (this.#mode === Mode.EDITING) {
+      this.#closeEditForm();
+    }
+  }
+
+  destroy() {
+    remove(this.#eventPointComponent);
+    remove(this.#editablePointComponent);
+  }
+
   #formSubmitHandler = (updatedEvent) => {
     this.#handleDataChange(
       UserAction.UPDATE_EVENT,
@@ -155,22 +158,19 @@ export default class EventPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  resetLastEditForm () {
-    if (this.#mode === Mode.EDITING) {
-      this.#closeEditForm();
-    }
-  }
-
-  destroy() {
-    remove(this.#eventPointComponent);
-    remove(this.#editablePointComponent);
-  }
-
   #handleDeleteClick = (event) => {
     this.#handleDataChange(
       UserAction.DELETE_EVENT,
       UpdateType.MINOR,
       event,
     );
+  };
+
+  #escKeyDownHandler = (evt) => {
+    if (isEscapeKey(evt)) {
+      evt.preventDefault();
+      this.#closeEditForm();
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
+    }
   };
 }

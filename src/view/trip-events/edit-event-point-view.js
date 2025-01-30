@@ -173,6 +173,11 @@ export default class EditablePoint extends AbstractStatefulView {
     }
   }
 
+  reset = () => {
+    this._setState(EditablePoint.parseEventToState(this.#event, this.#offers, this.#destinations));
+    this.updateElement(this._state);
+  };
+
   #dateFromCloseHandler = ([userDate]) => {
     this._setState({...this._state, dateFrom: userDate});
     const minDateTo = dayjs(this._state.dateFrom).add(1, 'minute').toDate();
@@ -322,11 +327,6 @@ export default class EditablePoint extends AbstractStatefulView {
         .forEach((checkbox) => checkbox.addEventListener('change', this.#offerChangeHandler));
     }
   }
-
-  reset = () => {
-    this._setState(EditablePoint.parseEventToState(this.#event, this.#offers, this.#destinations));
-    this.updateElement(this._state);
-  };
 
   #formDeleteClickHandler = (evt) => {
     evt.preventDefault();

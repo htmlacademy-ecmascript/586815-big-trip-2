@@ -39,49 +39,6 @@ export default class TripInfoPresenter {
     this.#containerComponent = new TripInfoContainer();
   }
 
-  #handleModelEvent = () => {
-    if (this.#eventsModel.events.length === 0) {
-      this.#destroy();
-      return;
-    }
-
-    if (this.#mainContainerComponent === null) {
-      this.init();
-    }
-
-    const datesChanged = isDatesChanged(this.#previousEvents, this.#eventsModel.events);
-    const citiesChanged = isCitiesChanged(this.#previousEvents, this.#eventsModel.events, this.#destinationsModel);
-    const costChanged = isCostChanged(this.#previousEvents, this.#eventsModel.events, this.#offersModel);
-
-    const hasChanges = datesChanged || citiesChanged || costChanged;
-
-    if (hasChanges) {
-      render(this.#mainContainerComponent, this.#container, RenderPosition.AFTERBEGIN);
-      render(this.#containerComponent, this.#mainContainerComponent.element, RenderPosition.AFTERBEGIN);
-    }
-
-    if (datesChanged) {
-      this.#getChangeTripDestinations();
-      this.#renderTripDestinations();
-      this.#getTripPeriod(this.#eventsModel.events.sort(sortEventsByDay));
-      this.#renderTripPeriod();
-    }
-
-    if (citiesChanged) {
-      this.#getChangeTripDestinations();
-      this.#renderTripDestinations();
-    }
-
-    if (costChanged) {
-      this.#getChangeCost();
-      this.#renderCost();
-    }
-
-    if (hasChanges) {
-      this.#previousEvents = [...this.#eventsModel.events];
-    }
-  };
-
   #destroy = () => {
     remove(this.#mainContainerComponent);
     remove(this.#containerComponent);
@@ -190,5 +147,48 @@ export default class TripInfoPresenter {
 
     replace(this.#periodComponent, prevPeriodComponent);
     remove(prevPeriodComponent);
+  };
+
+  #handleModelEvent = () => {
+    if (this.#eventsModel.events.length === 0) {
+      this.#destroy();
+      return;
+    }
+
+    if (this.#mainContainerComponent === null) {
+      this.init();
+    }
+
+    const datesChanged = isDatesChanged(this.#previousEvents, this.#eventsModel.events);
+    const citiesChanged = isCitiesChanged(this.#previousEvents, this.#eventsModel.events, this.#destinationsModel);
+    const costChanged = isCostChanged(this.#previousEvents, this.#eventsModel.events, this.#offersModel);
+
+    const hasChanges = datesChanged || citiesChanged || costChanged;
+
+    if (hasChanges) {
+      render(this.#mainContainerComponent, this.#container, RenderPosition.AFTERBEGIN);
+      render(this.#containerComponent, this.#mainContainerComponent.element, RenderPosition.AFTERBEGIN);
+    }
+
+    if (datesChanged) {
+      this.#getChangeTripDestinations();
+      this.#renderTripDestinations();
+      this.#getTripPeriod(this.#eventsModel.events.sort(sortEventsByDay));
+      this.#renderTripPeriod();
+    }
+
+    if (citiesChanged) {
+      this.#getChangeTripDestinations();
+      this.#renderTripDestinations();
+    }
+
+    if (costChanged) {
+      this.#getChangeCost();
+      this.#renderCost();
+    }
+
+    if (hasChanges) {
+      this.#previousEvents = [...this.#eventsModel.events];
+    }
   };
 }

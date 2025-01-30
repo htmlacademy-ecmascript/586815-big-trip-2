@@ -57,12 +57,6 @@ export default class TripEventsPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  init() {
-    remove(this.#sortComponent);
-    this.#eventsData = this.events;
-    this.#renderEvents();
-  }
-
   get events() {
     this.#filterType = this.#filterModel.filter;
     const events = this.#eventsModel.events;
@@ -78,6 +72,12 @@ export default class TripEventsPresenter {
     }
 
     return filteredEvents;
+  }
+
+  init() {
+    remove(this.#sortComponent);
+    this.#eventsData = this.events;
+    this.#renderEvents();
   }
 
   #renderEvents() {
@@ -125,7 +125,6 @@ export default class TripEventsPresenter {
   }
 
   createEvent() {
-    this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
 
     if(this.#eventsData.length === 0) {
@@ -137,7 +136,7 @@ export default class TripEventsPresenter {
     this.#newEventPresenter.init();
   }
 
-  #clearEvents () {
+  #clearEvents ({resetSortType = false} = {}) {
     this.#presentersPoints.forEach((presenter) => presenter.destroy());
     this.#presentersPoints.clear();
     remove(this.#sortComponent);
@@ -146,6 +145,17 @@ export default class TripEventsPresenter {
     if (this.#noEventComponent) {
       remove(this.#noEventComponent);
     }
+    if (resetSortType) {
+      this.#currentSortType = SortType.DAY;
+    }
+  }
+
+  #renderSort() {
+    this.#sortComponent = new TripSort({
+      onSortTypeChange: this.#handleSortTypeChange,
+      currentSortType: this.#currentSortType
+    });
+    render(this.#sortComponent, this.#container);
   }
 
   #handleViewAction = async (actionType, updateType, update) => {
@@ -190,7 +200,7 @@ export default class TripEventsPresenter {
         this.#renderEvents();
         break;
       case UpdateType.MAJOR:
-        this.#clearEvents();
+        this.#clearEvents({resetSortType: true});
         this.#renderEvents();
         break;
       case UpdateType.INIT:
@@ -216,12 +226,4 @@ export default class TripEventsPresenter {
     remove(this.#eventListComponent);
     this.#renderEvents();
   };
-
-  #renderSort() {
-    this.#sortComponent = new TripSort({
-      onSortTypeChange: this.#handleSortTypeChange,
-      currentSortType: this.#currentSortType
-    });
-    render(this.#sortComponent, this.#container);
-  }
 }
