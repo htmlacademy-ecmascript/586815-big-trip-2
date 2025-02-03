@@ -2,7 +2,7 @@ import Observable from '../framework/observable.js';
 import { calculateDuration } from '../utils/common.js';
 import { UpdateType } from '../const.js';
 
-export default class eventsModel extends Observable {
+export default class EventsModel extends Observable {
   #events = [];
   #mainApiService = null;
 
