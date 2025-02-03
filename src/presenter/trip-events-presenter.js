@@ -29,7 +29,7 @@ export default class TripEventsPresenter {
   #presentersEvent = new Map();
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
-  #filterModel = null;
+  #filtersModel = null;
   #noEventComponent = null;
   #newEventPresenter = null;
   #isLoading = true;
@@ -38,12 +38,12 @@ export default class TripEventsPresenter {
     upperLimit: TimeLimit.UPPER_LIMIT
   });
 
-  constructor({container, eventsModel, destinationsModel, offersModel, filterModel, onNewEventDestroy}) {
+  constructor({container, eventsModel, destinationsModel, offersModel, filtersModel, onNewEventDestroy}) {
     this.#container = container;
     this.#eventsModel = eventsModel;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
-    this.#filterModel = filterModel;
+    this.#filtersModel = filtersModel;
     this.#newEventPresenter = new NewEventPresenter({
       eventListContainer: this.#eventListComponent,
       newEventData,
@@ -54,11 +54,11 @@ export default class TripEventsPresenter {
     });
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
-    this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#filtersModel.addObserver(this.#handleModelEvent);
   }
 
   get events() {
-    this.#filterType = this.#filterModel.filter;
+    this.#filterType = this.#filtersModel.filter;
     const events = this.#eventsModel.events;
     const filteredEvents = filter[this.#filterType](events);
 
@@ -125,7 +125,7 @@ export default class TripEventsPresenter {
   }
 
   createEvent() {
-    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
 
     if(this.#eventsData.length === 0) {
       remove(this.#noEventComponent);

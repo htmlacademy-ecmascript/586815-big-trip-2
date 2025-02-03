@@ -3,17 +3,12 @@ const isDatesChanged = (previousEvents, currentEvents) => {
     return true;
   }
 
-  const sortedPreviousEvents = previousEvents.sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
-  const sortedCurrentEvents = currentEvents.sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
+  const sortedPreviousEvents = [...previousEvents].sort((eventA, eventB) => new Date(eventA.dateFrom) - new Date(eventB.dateFrom));
+  const sortedCurrentEvents = [...currentEvents].sort((eventA, eventB) => new Date(eventA.dateFrom) - new Date(eventB.dateFrom));
 
-  if (
-    sortedPreviousEvents[0].dateFrom !== sortedCurrentEvents[0].dateFrom ||
-    sortedPreviousEvents[sortedPreviousEvents.length - 1].dateTo !== sortedCurrentEvents[sortedCurrentEvents.length - 1].dateTo
-  ) {
-    return true;
-  }
+  const isNotSameDate = () => sortedPreviousEvents[0].dateFrom.toISOString().split('T')[0] !== sortedCurrentEvents[0].dateFrom.toISOString().split('T')[0] || sortedPreviousEvents[sortedPreviousEvents.length - 1].dateTo.toISOString().split('T')[0] !== sortedCurrentEvents[sortedCurrentEvents.length - 1].dateTo.toISOString().split('T')[0];
 
-  return false;
+  return isNotSameDate();
 };
 
 const isCitiesChanged = (previousEvents, currentEvents, destinationsModel) => {
@@ -21,8 +16,8 @@ const isCitiesChanged = (previousEvents, currentEvents, destinationsModel) => {
     return true;
   }
 
-  const sortedPreviousEvents = previousEvents.sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
-  const sortedCurrentEvents = currentEvents.sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
+  const sortedPreviousEvents = previousEvents.sort((eventA, eventB) => new Date(eventA.dateFrom) - new Date(eventB.dateFrom));
+  const sortedCurrentEvents = currentEvents.sort((eventA, eventB) => new Date(eventA.dateFrom) - new Date(eventB.dateFrom));
 
   if (sortedPreviousEvents.length > 3 || sortedCurrentEvents.length > 3) {
     if (
@@ -49,8 +44,8 @@ const isCostChanged = (previousEvents, currentEvents, offersModel) => {
     return true;
   }
 
-  const sortedPreviousEvents = previousEvents.sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
-  const sortedCurrentEvents = currentEvents.sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
+  const sortedPreviousEvents = previousEvents.sort((eventA, eventB) => new Date(eventA.dateFrom) - new Date(eventB.dateFrom));
+  const sortedCurrentEvents = currentEvents.sort((eventA, eventB) => new Date(eventA.dateFrom) - new Date(eventB.dateFrom));
 
   for (let i = 0; i < sortedPreviousEvents.length; i++) {
     const prevEvent = sortedPreviousEvents[i];

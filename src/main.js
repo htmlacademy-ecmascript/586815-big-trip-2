@@ -4,7 +4,7 @@ import TripEventsPresenter from './presenter/trip-events-presenter.js';
 import EventsModel from './model/events-model.js';
 import DestinationsModel from './model/destinations-model.js';
 import OffersModel from './model/offers-model.js';
-import FilterModel from './model/filters-model.js';
+import FiltersModel from './model/filters-model.js';
 import MainApiService from './main-api-service.js';
 
 const AUTHORIZATION = 'Basic hS2sfS44khh7rt3s';
@@ -21,7 +21,7 @@ const eventsModel = new EventsModel({
 });
 const destinationsModel = new DestinationsModel();
 const offersModel = new OffersModel();
-const filterModel = new FilterModel();
+const filtersModel = new FiltersModel();
 new TripInfoPresenter({container: tripHeaderContainer, eventsModel, offersModel, destinationsModel});
 
 const tripEventsPresenter = new TripEventsPresenter({
@@ -29,7 +29,7 @@ const tripEventsPresenter = new TripEventsPresenter({
   eventsModel: eventsModel,
   destinationsModel,
   offersModel,
-  filterModel,
+  filtersModel,
   onNewEventDestroy: handleNewEventFormClose
 });
 
@@ -38,14 +38,13 @@ MainApiService.fetchAllData(mainApiServiceComponent).then((response) => {
   destinationsModel.init(destinations);
   offersModel.init(offers);
   eventsModel.init(events);
+  newEventButtonComponent.disabled = false;
 }).catch(() => {
   newEventButtonComponent.disabled = true;
   tripEventsPresenter.renderError();
-}).finally(() => {
-  newEventButtonComponent.disabled = false;
 });
 
-const tripFiltersPresenter = new TripFiltersPresenter({container: tripFiltersContainer, filterModel, eventsModel});
+const tripFiltersPresenter = new TripFiltersPresenter({container: tripFiltersContainer, filtersModel, eventsModel});
 
 tripFiltersPresenter.init();
 tripEventsPresenter.init();

@@ -1,21 +1,21 @@
 import {render, replace, remove} from '../framework/render.js';
-import TripFilters from '../view/trip-filters-view.js';
+import TripFiltersView from '../view/trip-filters-view.js';
 import { filter } from '../utils/filter.js';
 import {FilterType, UpdateType} from '../const.js';
 
 export default class TripFiltersPresenter {
   #container = null;
-  #filterModel = null;
+  #filtersModel = null;
   #eventsModel = null;
   #filterComponent = null;
 
-  constructor({container, filterModel, eventsModel}) {
+  constructor({container, filtersModel, eventsModel}) {
     this.#container = container;
-    this.#filterModel = filterModel;
+    this.#filtersModel = filtersModel;
     this.#eventsModel = eventsModel;
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
-    this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#filtersModel.addObserver(this.#handleModelEvent);
   }
 
   get filters() {
@@ -29,9 +29,9 @@ export default class TripFiltersPresenter {
   init() {
     const filters = this.filters;
     const prevFilterComponent = this.#filterComponent;
-    this.#filterComponent = new TripFilters({
+    this.#filterComponent = new TripFiltersView({
       filters,
-      currentFilterType: this.#filterModel.filter,
+      currentFilterType: this.#filtersModel.filter,
       onFilterTypeChange: this.#handleFilterTypeChange
     });
 
@@ -49,9 +49,9 @@ export default class TripFiltersPresenter {
   };
 
   #handleFilterTypeChange = (filterType) => {
-    if (this.#filterModel.filter === filterType) {
+    if (this.#filtersModel.filter === filterType) {
       return;
     }
-    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+    this.#filtersModel.setFilter(UpdateType.MAJOR, filterType);
   };
 }

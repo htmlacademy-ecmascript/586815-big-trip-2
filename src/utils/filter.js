@@ -8,14 +8,4 @@ const filter = {
   [FilterType.PAST]: (events) => events.filter((event) => isEventExpired(event.dateTo)),
 };
 
-function generateFilter(events) {
-  return Object.entries(filter).map(
-    ([filterType, filterEvents]) => ({
-      type: filterType,
-      count: filterEvents(events).length,
-      currentEvents: filterEvents
-    }),
-  );
-}
-
-export { generateFilter, filter };
+export { filter };
